@@ -38,7 +38,7 @@ public class PortfolioDBDao implements PortfolioDao {
     }
 
     @Override
-    public Portfolio getMemberById(int id) {
+    public Portfolio getMemberByKey(Integer id) {
         final String GET_MEMBER = "SELECT * FROM Portfolios WHERE PortfolioId = ?;";
         Portfolio portfolio; // TODO: add error catching
         portfolio = jdbc.queryForObject(GET_MEMBER, new PortfolioMapper(), id);
@@ -57,7 +57,7 @@ public class PortfolioDBDao implements PortfolioDao {
     }
 
     @Override
-    public boolean deleteMemberById(int id) {
+    public boolean deleteMemberByKey(Integer id) {
         final String DELETE_MEMBER = "DELETE * FROM Portfolios WHERE PortfolioId = ?";
         int rowsAffected = jdbc.update(DELETE_MEMBER, id);
         return rowsAffected == 1;
