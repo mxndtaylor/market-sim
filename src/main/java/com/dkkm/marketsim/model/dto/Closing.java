@@ -8,19 +8,19 @@ import java.util.Objects;
 public class Closing {
 
     @NotNull
-    private Stock stock;
+    private String ticker;
     @NotNull
     private LocalDate date;
     @NotNull
     @Min(0)
     private Double price;
 
-    public Stock getStock() {
-        return stock;
+    public String getTicker() {
+        return ticker;
     }
 
-    public void setStock(Stock stock) {
-        this.stock = stock;
+    public void setTicker(String ticker) {
+        this.ticker = ticker;
     }
 
     public LocalDate getDate() {
@@ -44,13 +44,13 @@ public class Closing {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Closing closing = (Closing) o;
-        return stock.equals(closing.stock)
+        return ticker.equals(closing.ticker)
                 && date.equals(closing.date)
                 && price.equals(closing.price);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(stock, date, price);
+        return Objects.hash(ticker, date, price);
     }
 }
