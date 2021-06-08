@@ -1,5 +1,6 @@
 package com.dkkm.marketsim.service;
 
+import com.dkkm.marketsim.model.dto.Holding;
 import com.dkkm.marketsim.model.dto.Portfolio;
 
 import java.util.List;
@@ -11,4 +12,6 @@ public interface PortfolioService {
     List<Portfolio> getPortfolios();
     boolean deletePortfolioById(int id);
     boolean updatePortfolio(Portfolio portfolio);
+
+    int sellTickerQuantityFromPortfolio(int portfolioId, String ticker, int sellQuantity);
 }
