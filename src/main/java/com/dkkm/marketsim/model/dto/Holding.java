@@ -2,7 +2,6 @@ package com.dkkm.marketsim.model.dto;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.util.Objects;
 
 public class Holding {
@@ -10,6 +9,7 @@ public class Holding {
     @NotNull
     private Stock stock;
     @NotNull
+    @Min(0)
     private Integer quantity;
 
     public Stock getStock() {
