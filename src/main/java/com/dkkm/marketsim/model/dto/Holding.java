@@ -15,7 +15,9 @@ public class Holding {
     private LocalDate purchaseDate;
     @NotNull
     @Min(0)
-    private Integer quantity;
+    private Integer shareQuantity;
+
+    private Closing closing; // added in service layer
 
     public Integer getPortfolioId() {
         return portfolioId;
@@ -41,12 +43,20 @@ public class Holding {
         this.purchaseDate = purchaseDate;
     }
 
-    public Integer getQuantity() {
-        return quantity;
+    public Integer getShareQuantity() {
+        return shareQuantity;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
+    public void setShareQuantity(Integer shareQuantity) {
+        this.shareQuantity = shareQuantity;
+    }
+
+    public Closing getClosing() {
+        return closing;
+    }
+
+    public void setClosing(Closing closing) {
+        this.closing = closing;
     }
 
     @Override
@@ -54,11 +64,11 @@ public class Holding {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Holding holding = (Holding) o;
-        return portfolioId.equals(holding.portfolioId) && ticker.equals(holding.ticker) && purchaseDate.equals(holding.purchaseDate) && quantity.equals(holding.quantity);
+        return portfolioId.equals(holding.portfolioId) && ticker.equals(holding.ticker) && purchaseDate.equals(holding.purchaseDate) && shareQuantity.equals(holding.shareQuantity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(portfolioId, ticker, purchaseDate, quantity);
+        return Objects.hash(portfolioId, ticker, purchaseDate, shareQuantity);
     }
 }
