@@ -1,5 +1,6 @@
 package com.dkkm.marketsim.model.dao;
 
+import com.dkkm.marketsim.model.dto.Closing;
 import com.dkkm.marketsim.model.dto.Holding;
 import org.hibernate.bytecode.spi.NotInstrumentedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +37,16 @@ public class HoldingDBDao implements HoldingDao {
     }
 
     @Override
-    public Holding getMemberByKey(Holding keys) {
-        throw new NotInstrumentedException("This member is not accessible by Id");
+    public Holding getMemberByKey(Holding key) {
+        final String GET_MEMBER = "SELECT * FROM Holdings WHERE PortfolioId = ?, " +
+                "PurchaseDate = ?, Ticker = ?;";
+        Holding holding; // TODO: add error catching
+        holding = jdbc.queryForObject(GET_MEMBER, new HoldingMapper(),
+                key.getPortfolioId(),
+                key.getPurchaseDate(),
+                key.getTicker());
+
+        return holding;
     }
 
     @Override
@@ -72,13 +81,13 @@ public class HoldingDBDao implements HoldingDao {
     }
 
     @Override
-    public boolean deleteMemberByKey(Holding keys) {
+    public boolean deleteMemberByKey(Holding key) {
         final String DELETE_MEMBER = "DELETE * FROM Holdings WHERE " +
                 "PortfolioId = ?, Ticker = ?, PurchaseDate = ?;";
         int rowsAffected = jdbc.update(DELETE_MEMBER,
-                keys.getPortfolioId(),
-                keys.getTicker(),
-                keys.getPurchaseDate());
+                key.getPortfolioId(),
+                key.getTicker(),
+                key.getPurchaseDate());
         return rowsAffected == 1;
     }
 
