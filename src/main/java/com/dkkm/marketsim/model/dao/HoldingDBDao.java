@@ -26,7 +26,7 @@ public class HoldingDBDao implements HoldingDao {
                 holding.getPortfolioId(),
                 holding.getTicker(),
                 holding.getPurchaseDate(),
-                holding.getQuantity());
+                holding.getShareQuantity());
 
         if (rowsAffected == 0) {
             // TODO: add error throwing/catching
@@ -87,7 +87,7 @@ public class HoldingDBDao implements HoldingDao {
         final String UPDATE_MEMBER = "UPDATE Holdings SET Quantity = ? " +
                 "WHERE PortfolioId = ?, Ticker = ?, PurchaseDate = ?;";
         int rowsAffected = jdbc.update(UPDATE_MEMBER,
-                holding.getQuantity(),
+                holding.getShareQuantity(),
                 holding.getPortfolioId(),
                 holding.getTicker(),
                 holding.getPurchaseDate());
@@ -104,7 +104,7 @@ public class HoldingDBDao implements HoldingDao {
             holding.setPortfolioId(resultSet.getInt("PortfolioId"));
             holding.setTicker(resultSet.getString("Ticker"));
             holding.setPurchaseDate(resultSet.getDate("PurchaseDate").toLocalDate());
-            holding.setQuantity(resultSet.getInt("Quantity"));
+            holding.setShareQuantity(resultSet.getInt("Quantity"));
 
             return holding;
         }
