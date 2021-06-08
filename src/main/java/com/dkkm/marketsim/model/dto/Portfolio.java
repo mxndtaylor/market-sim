@@ -11,7 +11,6 @@ public class Portfolio {
     @NotNull
     @Min(1)
     private Integer id;
-
     @NotNull
     private LocalDate date;
     @NotNull
@@ -24,8 +23,7 @@ public class Portfolio {
     @Min(0)
     private Double startCash;
 
-    @NotNull
-    private List<Holding> holdings;
+    private List<Holding> holdings; // Added by service layer
 
     public Integer getId() {
         return id;
