@@ -13,7 +13,6 @@ import java.util.List;
 @RequestMapping("/api/portfolios")
 public class PortfolioController {
 
-    @Autowired
     private PortfolioService portfolioService;
 
     @GetMapping("/")
