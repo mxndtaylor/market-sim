@@ -1,6 +1,5 @@
 package com.dkkm.marketsim.service;
 
-import com.dkkm.marketsim.model.dto.Holding;
 import com.dkkm.marketsim.model.dto.Portfolio;
 
 import java.util.List;
