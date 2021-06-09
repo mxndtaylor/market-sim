@@ -2,6 +2,21 @@ import React, {Component} from 'react';
 import './MainPage.css';
 import {Container, Row, Col, Card, Button} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css'
+import { Link } from 'react-router-dom';
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getUTCDate(),
+        year = d.getFullYear();
+  
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+  
+    return [month, day, year].join('-');
+  }
 
 const StocksHeld = () => {
     return (
@@ -58,10 +73,12 @@ class MainPage extends Component {
     }
 
     render() {
+        console.log(this.props)
         return (
             <Container fluid>
                 <Row>
-                    <h1 className = "text-center">DATE CHOSEN GOES HERE</h1>
+                    {console.log(this.props.location.chosenDate)}
+                    <h1 className = "text-center">{formatDate(this.props.location.chosenDate)}</h1>
                 </Row>
                 <hr/>
                 <Row>
@@ -98,11 +115,11 @@ class MainPage extends Component {
                     </Col>
                     <Col sm = {2}>
                         <div className = "btn-arrow" id="arrowButton" name="arrowButton">
-                            <Button variant = "secondary" size="lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
-                            </svg>
-                            Next Day
+                            <Button variant = "secondary" size="lg" onClick={this.props.location.handleNextDay}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                </svg>
+                                Next Day
                             </Button>
                         </div>
                     </Col>
