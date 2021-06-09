@@ -6,6 +6,7 @@ import com.dkkm.marketsim.model.dto.Portfolio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -23,6 +24,27 @@ public class PortfolioServiceImpl
 
         this.closingService = closingService;
         this.holdingService = holdingService;
+    }
+
+    @Override
+    public Portfolio addMember(Portfolio portfolio) {
+        LocalDate currentDate = portfolio.getDate();
+        LocalDate startDate = portfolio.getStartDate();
+        if (startDate != null) {
+            portfolio.setDate(startDate);
+        } else if (currentDate != null) {
+            portfolio.setStartDate(currentDate);
+        }
+
+        Double currentCash = portfolio.getCash();
+        Double startCash = portfolio.getStartCash();
+        if (startCash != null) {
+            portfolio.setCash(startCash);
+        } else if (currentCash != null) {
+            portfolio.setStartCash(currentCash);
+        }
+
+        return super.addMember(portfolio);
     }
 
     @Override
