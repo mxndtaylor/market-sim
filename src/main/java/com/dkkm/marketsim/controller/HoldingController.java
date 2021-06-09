@@ -7,14 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/portfolios/{portfolioId}/holdings")
+@RequestMapping("/api/portfolios/member/{memberId}/holdings")
 public class HoldingController {
 
     @Autowired
     private HoldingService holdingService;
 
     @GetMapping("/")
-    public ResponseEntity getHoldingsByPortfolio(@PathVariable int portfolioId) {
-        return ResponseEntity.ok(holdingService.aggregatePortfolioHoldings(portfolioId));
+    public ResponseEntity getHoldingsByPortfolio(@PathVariable int memberId) {
+        return ResponseEntity.ok(holdingService.aggregatePortfolioHoldings(memberId));
     }
 }
