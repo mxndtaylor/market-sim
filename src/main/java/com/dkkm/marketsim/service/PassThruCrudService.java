@@ -1,13 +1,16 @@
-package com.dkkm.marketsim.model.dao;
+package com.dkkm.marketsim.service;
+
+import com.dkkm.marketsim.model.dao.CrudDao;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 /**
- * allows for crud operations in a dao
+ * allows for pass-through crud functions in a service
  * @param <M> the managed or Member type
  * @param <K> the look up or Key type
  */
-public interface CrudDao<M, K> {
+public interface PassThruCrudService<M, K> {
 
     M addMember(M member);
     M getMemberByKey(K key);
