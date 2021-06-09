@@ -25,7 +25,7 @@ public class PortfolioController {
     }
 
     @PostMapping("/member")
-    public ResponseEntity<Portfolio> createPortfolio(Portfolio portfolio) {
+    public ResponseEntity<Portfolio> createPortfolio(@RequestBody Portfolio portfolio) {
         // TODO: add validator check
         portfolio = portfolioService.addMember(portfolio);
         return new ResponseEntity<>(portfolio, HttpStatus.CREATED);
