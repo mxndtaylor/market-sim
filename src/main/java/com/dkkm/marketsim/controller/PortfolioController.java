@@ -19,7 +19,7 @@ public class PortfolioController {
     @GetMapping("/")
     @ResponseStatus(HttpStatus.OK)
     public List<Portfolio> fetchPortfolioList() {
-        return null;
+        return portfolioService.getPortfolios();
     }
 
     @PostMapping("/member")
@@ -39,12 +39,24 @@ public class PortfolioController {
     @PostMapping("/member/{memberId}/{ticker}")
     public ResponseEntity<Integer> sellPortfolioShares(
             @PathVariable int memberId, @PathVariable String ticker,
-            @RequestBody int quantity) {
+            @RequestBody Integer quantity) {
         // TODO: add validator check
         int quantitySold = portfolioService.sellTickerQuantityFromPortfolio(
                 memberId, ticker, quantity);
 
         return ResponseEntity.ok(quantitySold);
+    }
+
+    @PutMapping("/member")
+    public ResponseEntity updatePortfolio(@RequestBody Portfolio portfolio) {
+        boolean succeeded = portfolioService.updatePortfolio(portfolio);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/member/{memberId}")
+    public ResponseEntity deletePortfolio(@PathVariable int memberId) {
+        boolean succeeded = portfolioService.deletePortfolioById(memberId);
+        return ResponseEntity.noContent().build();
     }
 
 }
