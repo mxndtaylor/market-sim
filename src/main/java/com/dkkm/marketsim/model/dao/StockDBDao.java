@@ -53,7 +53,14 @@ public class StockDBDao implements CrudDao<Stock, String> {
     }
 
     @Override
+    @Transactional
     public boolean deleteMemberByKey(String ticker) {
+        final String DELETE_HOLDINGS = "DELETE * FROM Holdings WHERE Ticker = ?;";
+        jdbc.update(DELETE_HOLDINGS, ticker);
+
+        final String DELETE_CLOSINGS = "DELETE * FROM Closings WHERE Ticker = ?;";
+        jdbc.update(DELETE_CLOSINGS, ticker);
+
         final String DELETE_MEMBER = "DELETE * FROM Stocks WHERE Ticker = ?";
         int rowsAffected = jdbc.update(DELETE_MEMBER, ticker);
         return rowsAffected == 1;

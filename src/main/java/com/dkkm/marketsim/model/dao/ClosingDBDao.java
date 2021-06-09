@@ -54,7 +54,13 @@ public class ClosingDBDao implements ClosingDao {
     }
 
     @Override
+    @Transactional
     public boolean deleteMemberByKey(Closing key) {
+        final String DELETE_HOLDINGS = "DELETE * FROM Holdings WHERE Date = ?, Ticker = ?;";
+        jdbc.update(DELETE_HOLDINGS,
+                key.getDate(),
+                key.getTicker());
+
         final String DELETE_MEMBER = "DELETE * FROM Closings WHERE Date = ?, Ticker = ?;";
         int rowsAffected = jdbc.update(DELETE_MEMBER,
                 key.getDate(),
