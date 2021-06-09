@@ -7,15 +7,18 @@ import java.util.List;
 public interface HoldingService extends PassThruCrudService<Holding, Holding> {
 
     // TODO: int getPortfolioNetWorth(int portfolioId);
+    // TODO: consider moving these to dao, using a sql agg function
+    // con: sql has good agg function, but other dao impls might not
     List<Holding> aggregatePortfolioHoldings(int portfolioId);
     Holding aggregatePortfolioHoldingsByTicker(int portfolioId, String ticker);
 
     /**
      * sell the oldest shares of a stock from a portfolio
-     * @param portfolioId the lookup for the portfolio
-     * @param ticker the lookup for the stock
-     * @return true on success, false otherwise
+     * @param aggregateHolding a Holding object containing:
+     *                         portfolioId, ticker, shareQuantity
+     *                         where the last value represents the
+     *                         desired quantity
+     * @return number of shares sold
      */
-    boolean updatePortfolioHoldingsByTicker(int portfolioId, String ticker, int sellQuantity);
-
+    int sellHoldingsByAggHolding(Holding aggregateHolding);
 }

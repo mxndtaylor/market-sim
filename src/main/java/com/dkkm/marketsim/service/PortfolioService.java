@@ -12,4 +12,13 @@ public interface PortfolioService extends PassThruCrudService<Portfolio, Integer
      * @return int representing the number of shares successfully sold
      */
     int sellTickerQuantityFromPortfolio(int portfolioId, String ticker, int sellQuantity);
+
+    /**
+     * attempt to buy a certain number of shares for a portfolio
+     * @param portfolioId the portfolio look up
+     * @param ticker the look up key for a stock
+     * @param buyQuantity the number of shares attempted to buy
+     * @return int representing number of shares successfully bought
+     */
+    int buyTickerQuantityForPortfolio(int portfolioId, String ticker, int buyQuantity);
 }

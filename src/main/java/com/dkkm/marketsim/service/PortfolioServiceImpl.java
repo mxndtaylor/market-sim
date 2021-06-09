@@ -6,7 +6,6 @@ import com.dkkm.marketsim.model.dto.Portfolio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -61,18 +60,37 @@ public class PortfolioServiceImpl
         Holding holding = holdingService.aggregatePortfolioHoldingsByTicker(portfolioId, ticker);
         int initialQuantity = holding.getShareQuantity();
         int remainingQuantity = Math.max(0, initialQuantity - sellQuantity);
-        int soldQuantity = initialQuantity - remainingQuantity;
 
-        boolean success = holdingService.updatePortfolioHoldingsByTicker(portfolioId,
-                ticker, soldQuantity);
-        if (!success) {
-            soldQuantity = 0;
-        }
+        holding.setShareQuantity(remainingQuantity);
+        int soldQuantity = holdingService.sellHoldingsByAggHolding(holding);
 
         double shareValue = closingService.getSharePrice(ticker, portfolio.getDate());
         portfolio.setCash(portfolio.getCash() + soldQuantity * shareValue);
         dao.updateMember(portfolio);
         return soldQuantity;
+    }
+
+    @Override
+    public int buyTickerQuantityForPortfolio(int portfolioId, String ticker, int buyQuantity) {
+        Portfolio portfolio = dao.getMemberByKey(portfolioId);
+
+        double pricePerShare = closingService.getSharePrice(ticker, portfolio.getDate());
+        int affordQuantity = (int) Math.floor(portfolio.getCash() / pricePerShare);
+        int boughtQuantity = Math.min(buyQuantity, affordQuantity);
+
+        Holding holding = new Holding();
+        holding.setShareQuantity(boughtQuantity);
+
+        if (holding.getShareQuantity() > 0) {
+            Holding newHolding = new Holding();
+            newHolding.setPortfolioId(portfolioId);
+            newHolding.setTicker(ticker);
+            newHolding.setPurchaseDate(portfolio.getDate());
+
+            holding = holdingService.addMember(newHolding);
+        }
+
+        return holding.getShareQuantity();
     }
 
     private void setHoldings(Portfolio portfolio) {
