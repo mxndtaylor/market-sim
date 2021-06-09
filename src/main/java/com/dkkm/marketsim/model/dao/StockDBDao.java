@@ -20,7 +20,6 @@ public class StockDBDao implements CrudDao<Stock, String> {
     private JdbcTemplate jdbc;
 
     @Override
-    @Transactional
     public Stock addMember(Stock stock) {
         final String ADD_STOCK = "INSERT INTO Stocks (Ticker, IPODate) VALUES (?, ?);";
 
