@@ -15,6 +15,16 @@ public class Closing {
     @Min(0)
     private Double price;
 
+    public Closing(LocalDate date, String symbol, Double close) {
+        this.date = date;
+        this.ticker = symbol;
+        this.price = close;
+    }
+
+    public Closing() {
+
+    }
+
     public String getTicker() {
         return ticker;
     }
