@@ -15,6 +15,8 @@ public class Closing {
     @Min(0)
     private Double price;
 
+    private Stock stock; // added by service layer
+
     public Closing(LocalDate date, String symbol, Double close) {
         this.date = date;
         this.ticker = symbol;
@@ -47,6 +49,14 @@ public class Closing {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
 
     @Override
