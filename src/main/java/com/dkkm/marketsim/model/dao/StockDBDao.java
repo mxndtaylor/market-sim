@@ -17,7 +17,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-public class StockDBDao implements CrudDao<Stock, String> {
+public class StockDBDao implements StockDao {
 
     @Autowired
     private JdbcTemplate jdbc;
