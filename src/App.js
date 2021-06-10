@@ -3,7 +3,7 @@ import {Container, Row, Col} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import MainPage from './components/MainPage'
-
+import APIService from './APIService'
 
 function formatDate(date) {
   var d = new Date(date),
@@ -28,6 +28,7 @@ class App extends Component {
     curr.setDate(curr.getDate());
     this.state = {
       currentDate: formatDate(curr),
+      stocks: [],
       dummyStocks: [ {
         ticker: "TSLA",
         price: 200
@@ -127,7 +128,10 @@ class App extends Component {
       ],
       gameStart:false,
       budget: 1000,
-      profit: 0
+      profit: 0,
+      numShares: 0,
+      stocksHeld: []
+
     }
 
   }
@@ -154,6 +158,16 @@ class App extends Component {
       })
   }
 
+
+  // componentDidMount() {
+  //   APIService.getPortfolio()
+  //   .then(res => {
+  //     const stocks = res.data;
+  //     this.setState ({
+  //       stocks
+  //     })
+  //   })
+  // }
   
 
   handleNextDayChange = () => {
@@ -174,7 +188,28 @@ class App extends Component {
     );
   }
   
+  handleSharesChange = (event) => {
 
+    let inputName = event.target.name;
+    let inputValue = event.target.value;
+    let finalNumShares = this.state.numShares;
+  
+    console.log(`Something changed in ${inputName} : ${inputValue}`)
+  
+    if(finalNumShares.hasOwnProperty(inputName)){
+        finalNumShares[inputName] = inputValue;
+        this.setState({ numShares : finalNumShares })
+    }
+  }
+  
+  handleBuyShares = (currKey,currentNumShares) => {
+    // TODO: add stock chosen to portfolio
+    //       update stocksHeld
+    console.log("INSIDE HANDLE BUY SHARES")
+    this.state.stocksHeld.push(this.state.dummyStocks[currKey]) 
+    console.log(this.state.stocksHeld)
+    console.log(currentNumShares)
+  }
   
   render() {
     return (
@@ -213,6 +248,10 @@ class App extends Component {
             handleNextDay={this.handleNextDayChange}
             budget = {this.state.budget}
             profit = {this.state.profit}
+            numShares = {this.state.numShares}
+            handleSharesChange = {this.handleSharesChange}
+            handleBuyShares = {this.handleBuyShares}
+            stocksHeld = {this.state.stocksHeld}
         />
       </Container> : null}
 

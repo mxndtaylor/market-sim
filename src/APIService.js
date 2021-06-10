@@ -1,11 +1,22 @@
 import axios from 'axios';
 
-const BOOK_API_REST_URL = "http://localhost:8080/portfolios";
+const GET_API_PORTFOLIO = "http://localhost:8080/portfolios/";
 
 class APIService {
-    
-    getBooks(){
-        return axios.get(BOOK_API_REST_URL);
+
+    // gets all stocks in portfolio
+    getPortfolio() {
+        return axios.get(GET_API_PORTFOLIO);
+    }
+
+    // creates portfolio
+    createPortfolio() {
+        return axios.post(GET_API_PORTFOLIO + 'member')
+    }
+
+    // update portfolio
+    updatePortfolio() {
+        return axios.put(GET_API_PORTFOLIO + 'member')
     }
 
 }
