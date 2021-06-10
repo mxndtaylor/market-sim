@@ -23,7 +23,7 @@ public class ClosingDBDao implements ClosingDao {
     @Transactional
     public Closing addMember(Closing closing) {
         final String ADD_MEMBER = "INSERT INTO Closings (Date, Ticker, Price) " +
-                "VALUES (?,?,?);";
+                "VALUES (?,?,TRUNCATE(?,2));";
         int rowsAffected = jdbc.update(ADD_MEMBER,
                 closing.getDate(),
                 closing.getTicker(),
@@ -75,7 +75,7 @@ public class ClosingDBDao implements ClosingDao {
 
     @Override
     public boolean updateMember(Closing closing) {
-        final String UPDATE_MEMBER = "UPDATE Closings SET Price = ? " +
+        final String UPDATE_MEMBER = "UPDATE Closings SET Price = TRUNCATE(?,2) " +
                 "WHERE Date = ? AND Ticker = ?;";
         int rowsAffected = jdbc.update(UPDATE_MEMBER,
                 closing.getPrice(),

@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 
 @RestController
 @RequestMapping("/api/tickers")
@@ -37,14 +37,15 @@ public class MarketStackController {
     @Autowired
     private StockDBDao stockDao;
 
-    @RequestMapping("/initDB")
-    public List<Stock> initDB() {
+    @RequestMapping("/initDB/{date}")
+    public List<Closing> initDB(@PathVariable String date) {
         String[] tickers = initStocks();
 
         for(int i = 0; i < tickers.length; i++) {
             setTickerData(tickers[i]);
         }
-        return stockDao.getMembers();
+        LocalDate localDate = LocalDate.parse(date);
+        return closingDao.getClosingsByDate(localDate);
     }
 
     @RequestMapping("/initStocks")
@@ -66,8 +67,9 @@ public class MarketStackController {
         Data data = new Data();
         data.setData((Map<String, Object>) response);
         data.setDataList((ArrayList<Map<String, Object>>) data.getData().get("data"));
+        DecimalFormat df=new DecimalFormat("#.##");
         for(int i = 0; i < 30; i++) {
-            double close = (double) data.getDataList().get(i).get("close");
+            double close = Double.parseDouble(df.format(data.getDataList().get(i).get("close")));
             String symbol = (String) data.getDataList().get(i).get("symbol");
             DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
             LocalDateTime localDateTime = LocalDateTime.parse((String)data.getDataList().get(i).get("date"),format);
