@@ -29,3 +29,12 @@ h2 {
     overflow-x: hidden;
     max-height: 500px;
 }
+
+#stockDisplay:hover {
+    transform: scale(1.01);
+    box-shadow: 1px 1px 2px 2px lightgray;
+}
+
+#stockDisplay {
+    margin: 3px;
+}

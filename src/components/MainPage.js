@@ -8,7 +8,7 @@ import APIService from '../APIService'
 
 const StocksHeld = () => {
     return (
-        <Card >
+        <Card id = "stockDisplay" name = "stockDisplay">
             <Card.Header>Ticker</Card.Header>
             <Card.Body>
                 <Row>
@@ -46,7 +46,7 @@ function formatDate(date) {
 
   const StockCard = ({dummyStock, numShares, handleSharesChange, myKey, handleBuyShares}) => {
     return (
-        <Card style={{ width: '18rem' }}>
+        <Card style={{ width: '18rem' }} id = "stockDisplay" name = "stockDisplay">
             <Card.Header>{dummyStock.ticker}</Card.Header>
             <Card.Body>
                 <Row>
@@ -97,6 +97,14 @@ class MainPage extends Component {
                                                 numshares = {this.props.numShares} handleSharesChange = {this.props.handleSharesChange}  
                                                 handleBuyShares = {this.props.handleBuyShares}/> 
                                         })} */}
+                            <StocksHeld />
+                            <StocksHeld />
+                            <StocksHeld />
+                            <StocksHeld />
+                            <StocksHeld />
+                            <StocksHeld />
+                            <StocksHeld />
+                            <StocksHeld />
                         </div>
                     </Col>
                     <Col sm = {8}>

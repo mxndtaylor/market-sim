@@ -1,22 +1,18 @@
 import axios from 'axios';
 
-const GET_API_PORTFOLIO = "http://localhost:8080/portfolios/";
+const GET_API_PORTFOLIO = "http://localhost:8080/api/portfolios/";
+const GET_API_STOCKS = "http://localhost:8080/api/tickers/"
+const GET_API_CLOSINGS = "http://localhost:8080/api/closings/"
 
-class APIService {
+class APIService{
 
-    // gets all stocks in portfolio
-    getPortfolio() {
-        return axios.get(GET_API_PORTFOLIO);
+    initializeStocks(date) {
+        return axios.get(GET_API_STOCKS + 'initDB/' + date)
     }
 
-    // creates portfolio
-    createPortfolio() {
-        return axios.post(GET_API_PORTFOLIO + 'member')
-    }
-
-    // update portfolio
-    updatePortfolio() {
-        return axios.put(GET_API_PORTFOLIO + 'member')
+    getPricesByDate(date) {
+        console.log("AXIOS GOT DATE: " + date)
+        return axios.get(GET_API_CLOSINGS + date)
     }
 
 }

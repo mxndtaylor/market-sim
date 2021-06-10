@@ -7,6 +7,20 @@ import APIService from './APIService'
 
 function formatDate(date) {
   var d = new Date(date),
+      month = '' + (d.getMonth()),
+      day = '' + d.getUTCDate(),
+      year = d.getFullYear();
+
+  if (month.length < 2) 
+      month = '0' + month;
+  if (day.length < 2) 
+      day = '0' + day;
+
+  return [year, month, day].join('-');
+}
+
+function formatDateForNext(date) {
+  var d = new Date(date),
       month = '' + (d.getMonth() + 1),
       day = '' + d.getUTCDate(),
       year = d.getFullYear();
@@ -28,7 +42,11 @@ class App extends Component {
     curr.setDate(curr.getDate());
     this.state = {
       currentDate: formatDate(curr),
-      stocks: [],
+      stocks: [{
+        ticker: "",
+        ipo: null,
+        price: 0
+      }],
       dummyStocks: [ {
         ticker: "TSLA",
         price: 200
@@ -156,16 +174,35 @@ class App extends Component {
       this.setState({
         gameStart:true
       })
+
+      APIService.initializeStocks(this.state.currentDate)
+      .then(res => {
+      console.log(res)
+      this.setState ({
+        stocks: res.data
+      })
+      console.log(this.state.stocks)
+    })
+
   }
+
+  // getPriceByDate () {
+  //   APIService.getPricesByDate(this.state.currentDate) 
+  //     .then(res => {
+
+  //     })
+    
+  // }
 
 
   // componentDidMount() {
-  //   APIService.getPortfolio()
+  //   APIService.initializeStocks()
   //   .then(res => {
-  //     const stocks = res.data;
+  //     console.log(res)
   //     this.setState ({
-  //       stocks
+  //       stocks: res.data
   //     })
+  //     console.log(this.state.stocks)
   //   })
   // }
   
@@ -173,9 +210,9 @@ class App extends Component {
   handleNextDayChange = () => {
     // console.log('Changing next day')
     var date = new Date(this.state.currentDate);
-    // console.log("Before: "+date)
+    console.log("Before: "+date)
     date.setDate(date.getDate()+1);
-    // console.log("After: "+date)
+     console.log("After: "+date)
     let newProfit = this.state.profit + 3;
     let newBudget = this.state.budget + 5;
     this.setState({
@@ -186,6 +223,15 @@ class App extends Component {
       console.log("new state check:" + this.state.currentDate)
   }
     );
+
+    APIService.getPricesByDate(formatDateForNext(this.state.currentDate))
+      .then(res => {
+      console.log(res)
+      this.setState ({
+        stocks: res.data
+      })
+      console.log(this.state.stocks)
+    })
   }
   
   handleSharesChange = (event) => {
@@ -227,7 +273,7 @@ class App extends Component {
           <Col sm={12}>
             <Row>
               <Col md={{ span: 3, offset: 3 }}>
-                <label for="inputDate">CHOOSE DATE</label>
+                <label for="inputDate"></label>
                 <input id="inputDate" name="currentDate" type = "date" 
                         value = {this.state.currentDate} onChange={this.handleDateChange}></input>
               </Col>
@@ -243,7 +289,7 @@ class App extends Component {
 
       {this.state.gameStart ? <Container fluid>
         <MainPage
-            dummyStocks={this.state.dummyStocks}
+            dummyStocks={this.state.stocks}
             chosenDate = {this.state.currentDate}
             handleNextDay={this.handleNextDayChange}
             budget = {this.state.budget}
