@@ -8,10 +8,7 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class Mocker {
-
-    // rng generator
-    private Random rng;
+public class Mocker extends Random {
 
     // data type generators
     private Iterator<String> tickerIter;
@@ -27,7 +24,7 @@ public class Mocker {
     private Iterator<Portfolio> portfolioIter;
 
     public Mocker(long seed) {
-        rng = new Random(seed);
+        super(seed);
 
         // init data type generators
         tickers();
@@ -128,7 +125,7 @@ public class Mocker {
 
             // make real valid holdings to insert into table
             List<Holding> holdings = new ArrayList<>();
-            for (int i = 0; i < rng.nextInt(12); i++) {
+            for (int i = 0; i < super.nextInt(12); i++) {
                 Holding holding = holdingIter.next();
                 holding.setPortfolioId(portfolio.getId());
                 holdings.add(holding);
@@ -164,7 +161,7 @@ public class Mocker {
     }
 
     public IntStream ids() {
-        IntStream idStream = rng.ints(0, Integer.MAX_VALUE);
+        IntStream idStream = super.ints(0, Integer.MAX_VALUE);
         if (idIter == null) {
             idIter = idStream.iterator();
         }
@@ -172,7 +169,7 @@ public class Mocker {
     }
 
     public DoubleStream prices() {
-        DoubleStream doubleStream = rng.doubles(0, 400000);
+        DoubleStream doubleStream = super.doubles(0, 400000);
         if (priceIter == null) {
             priceIter = doubleStream.iterator();
         }
@@ -180,7 +177,7 @@ public class Mocker {
     }
 
     public DoubleStream cashes() {
-        DoubleStream doubleStream = rng.doubles(0, Double.MAX_VALUE);
+        DoubleStream doubleStream = super.doubles(0, Double.MAX_VALUE);
         if (cashIter == null) {
             cashIter = doubleStream.iterator();
         }
@@ -190,10 +187,10 @@ public class Mocker {
     public Stream<String> tickers() {
         int capA = 65; // ascii code for A
         int capZ = 90; // ascii code for Z
-        PrimitiveIterator.OfInt chars = rng.ints(capA, capZ).iterator();
+        PrimitiveIterator.OfInt chars = super.ints(capA, capZ).iterator();
         Stream<String> tickerStream = Stream.generate(() -> {
             StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < 4 - rng.nextInt(4); i++) {
+            for (int i = 0; i < 4 - super.nextInt(4); i++) {
                 builder.appendCodePoint(chars.nextInt());
             }
             return builder.toString();
@@ -207,7 +204,7 @@ public class Mocker {
     public Stream<LocalDate> dates() {
         long epoch = LocalDate.EPOCH.toEpochDay();
         long now = LocalDate.now().toEpochDay();
-        PrimitiveIterator.OfLong dayIter = rng.longs(epoch, now).iterator();
+        PrimitiveIterator.OfLong dayIter = super.longs(epoch, now).iterator();
         Stream<LocalDate> dateStream = Stream.generate(() -> (LocalDate.ofEpochDay(dayIter.nextLong())));
         if (dateIter == null) {
             dateIter = dateStream.iterator();
