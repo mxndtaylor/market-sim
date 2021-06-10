@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -16,6 +17,7 @@ import java.util.List;
 @RequestMapping("/api/portfolios")
 public class PortfolioController {
 
+    @Autowired
     private PortfolioService portfolioService;
 
     @GetMapping("/")
@@ -44,17 +46,17 @@ public class PortfolioController {
             @RequestBody Holding holding) {
         String ticker = holding.getTicker();
         int buyQuantity = holding.getShareQuantity();
-        int boughtQuantity = portfolioService.buyTickerQuantityForPortfolio(memberId, ticker, buyQuantity);
+        LocalDate date = holding.getPurchaseDate();
+        int boughtQuantity = portfolioService.buyTickerQuantityForPortfolio(memberId, ticker, date, buyQuantity);
         return new ResponseEntity<>(boughtQuantity, HttpStatus.OK);
     }
 
-    @PostMapping("/member/{memberId}/{ticker}")
+    @PostMapping("/member/{memberId}/{ticker}/{quantity}")
     public ResponseEntity<Integer> sellPortfolioShares(
             @PathVariable int memberId, @PathVariable String ticker,
-            @RequestBody Integer quantity) {
+            @PathVariable Integer quantity) {
         // TODO: add validator check
-        int quantitySold = portfolioService.sellTickerQuantityFromPortfolio(
-                memberId, ticker, quantity);
+        int quantitySold = portfolioService.sellTickerQuantityFromPortfolio(memberId, ticker, quantity);
 
         return ResponseEntity.ok(quantitySold);
     }

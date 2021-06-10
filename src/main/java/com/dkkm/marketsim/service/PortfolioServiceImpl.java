@@ -97,11 +97,17 @@ public class PortfolioServiceImpl
     }
 
     @Override
-    public int buyTickerQuantityForPortfolio(int portfolioId, String ticker, int buyQuantity) {
+    public int buyTickerQuantityForPortfolio(int portfolioId, String ticker, LocalDate date, int buyQuantity) {
         Portfolio portfolio = dao.getMemberByKey(portfolioId);
 
         BigDecimal pricePerShare = closingService.getSharePrice(ticker, portfolio.getDate());
-        int affordQuantity = portfolio.getCash().divide(pricePerShare, RoundingMode.DOWN).intValueExact();
+        pricePerShare.setScale(2,RoundingMode.HALF_UP);
+
+        BigDecimal portfolioCash = portfolio.getCash().setScale(2,RoundingMode.HALF_UP);
+
+        BigDecimal divide = portfolioCash.divide(pricePerShare,2,RoundingMode.FLOOR);
+
+        int affordQuantity = divide.intValue();
         int boughtQuantity = Math.min(buyQuantity, affordQuantity);
 
         Holding holding = new Holding();
@@ -111,7 +117,8 @@ public class PortfolioServiceImpl
             Holding newHolding = new Holding();
             newHolding.setPortfolioId(portfolioId);
             newHolding.setTicker(ticker);
-            newHolding.setPurchaseDate(portfolio.getDate());
+            newHolding.setPurchaseDate(date);
+            newHolding.setShareQuantity(boughtQuantity);
 
             holding = holdingService.addMember(newHolding);
         }

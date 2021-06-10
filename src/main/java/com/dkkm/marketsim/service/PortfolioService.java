@@ -2,6 +2,8 @@ package com.dkkm.marketsim.service;
 
 import com.dkkm.marketsim.model.dto.Portfolio;
 
+import java.time.LocalDate;
+
 public interface PortfolioService extends PassThruCrudService<Portfolio, Integer> {
 
     /**
@@ -17,8 +19,9 @@ public interface PortfolioService extends PassThruCrudService<Portfolio, Integer
      * attempt to buy a certain number of shares for a portfolio
      * @param portfolioId the portfolio look up
      * @param ticker the look up key for a stock
+     * @param date
      * @param buyQuantity the number of shares attempted to buy
      * @return int representing number of shares successfully bought
      */
-    int buyTickerQuantityForPortfolio(int portfolioId, String ticker, int buyQuantity);
+    int buyTickerQuantityForPortfolio(int portfolioId, String ticker, LocalDate date, int buyQuantity);
 }
