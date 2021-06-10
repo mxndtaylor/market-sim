@@ -33,12 +33,12 @@ function formatDateForNext(date) {
   return [year, month, day].join('-');
 }
 
-function findTicker(stocksHeld, ticker){
-  if(stocksHeld.length == 0){
+function findTicker (portfolio, ticker){
+  if (portfolio.length === 0){
     return -1
   }
-  for( var i = 0; i < stocksHeld.length; i++){
-    let curStockTicker = stocksHeld[i][0].ticker
+  for( var i = 0; i < portfolio.length; i++){
+    let curStockTicker = portfolio[i][0].ticker
     if(curStockTicker === ticker){ //where ticker is held
       return i;
     }
@@ -205,11 +205,9 @@ class App extends Component {
     date.setDate(date.getDate()+1);
      console.log("After: "+date)
     let newProfit = this.state.profit + 3;
-    let newBudget = this.state.budget + 5;
     this.setState({
       currentDate: date,
-      profit: newProfit,
-      budget: newBudget
+      profit: newProfit
     }, function(){
       console.log("new state check:" + this.state.currentDate)
   }
@@ -224,8 +222,9 @@ class App extends Component {
       console.log(this.state.stocks)
     })
   }
-  
+
   handleSharesSell = (event) => {
+
     let inputName = event.target.name;
     let inputValue = event.target.value;
   
@@ -244,22 +243,61 @@ class App extends Component {
   
   handleBuyShares = (currKey) => {
 
+    let tempPort = this.state.portfolio
     let curStock = this.state.stocks[currKey]
     console.log(curStock)
 
     let index = findTicker(this.state.portfolio, curStock.ticker)
     if(index !== -1){
-      this.state.portfolio[index][1] = this.state.portfolio[index][1] + rNumShares
+      tempPort[index][1] = this.state.portfolio[index][1] + rNumShares
     }
     else{
-      this.state.portfolio.push([curStock,rNumShares]) 
+      tempPort.push([curStock,rNumShares]) 
     }
 
+    // let tempBudget = this.state.budget - curStock.price * rNumShares
+
+    // if(tempBudget < 0) {
+    //   tempBudget = "you lose loser boy"
+    // }
+
     this.setState({
-      portfolio: this.state.portfolio
+      portfolio: tempPort
+      // budget: tempBudget
     })
 
     console.log(this.state.portfolio)
+
+  }
+
+  handleSellShares = (currKey) =>{
+    let tempPort = this.state.portfolio
+    let curStock = this.state.stocks[currKey]
+    console.log(this.state.portfolio)
+    console.log(curStock.ticker)
+    let index = findTicker(this.state.portfolio, curStock.ticker)
+    console.log(index)
+    console.log(this.state.portfolio[index])
+    let temp = this.state.portfolio[index][1] - rNumShares
+
+    //error checking later?
+    if(temp < 0){
+      return
+    }
+    else if(temp === 0){
+      tempPort.splice(index,1)
+    }
+    else {
+      tempPort[index][1] = this.state.portfolio[index][1] - rNumShares
+    }
+    console.log(this.state.portfolio)
+
+    let tempBudget = this.state.budget + curStock.price * rNumShares
+
+    this.setState({
+      portfolio: tempPort,
+      budget: tempBudget
+    })
 
   }
   
@@ -305,6 +343,7 @@ class App extends Component {
             handleBuyShares = {this.handleBuyShares}
             portfolio = {this.state.portfolio}
             handleSharesSell = {this.handleSharesSell}
+            handleSellShares = {this.handleSellShares}
         />
       </Container> : null}
 
