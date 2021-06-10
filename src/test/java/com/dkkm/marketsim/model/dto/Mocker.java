@@ -47,8 +47,8 @@ public class Mocker extends Random {
     public Stream<Stock> stocks() {
         Stream<Stock> stockStream = Stream.generate(() -> {
             Stock stock = new Stock();
-            stock.setTicker(tickerIter.next());
-            stock.setIpo(dateIter.next());
+            stock.setTicker(nextTicker());
+            stock.setIpo(nextDate());
 
             return stock;
         });
@@ -65,8 +65,8 @@ public class Mocker extends Random {
     public Stream<Closing> closings(Iterator<Stock> stockIter) {
         Stream<Closing> closingStream = Stream.generate(() -> {
             Closing closing = new Closing();
-            closing.setDate(dateIter.next());
-            closing.setPrice(priceIter.next());
+            closing.setDate(nextDate());
+            closing.setPrice(nextPrice());
 
             // make valid connection
             Stock stock = stockIter.next();
@@ -93,8 +93,8 @@ public class Mocker extends Random {
 
         Stream<Holding> holdingStream = Stream.generate(() -> {
             Holding holding = new Holding();
-            holding.setPortfolioId(idIter.next());
-            holding.setShareQuantity(idIter.next());
+            holding.setPortfolioId(portfolioIter.next().getId());
+            holding.setShareQuantity(nextId());
 
             // make valid connections
             Closing closing = closingIter.next();
@@ -121,7 +121,7 @@ public class Mocker extends Random {
     public Stream<Portfolio> portfolios() {
         Stream<Portfolio> portfolioStream = Stream.generate(() -> {
             Portfolio portfolio = new Portfolio();
-            portfolio.setId(idIter.next());
+            portfolio.setId(nextId());
 
             // make real valid holdings to insert into table
             List<Holding> holdings = new ArrayList<>();
@@ -132,12 +132,12 @@ public class Mocker extends Random {
             }
             portfolio.setHoldings(holdings);
 
-            portfolio.setCash(cashIter.next());
-            portfolio.setStartCash(cashIter.next());
+            portfolio.setCash(nextCash());
+            portfolio.setStartCash(nextCash());
 
             // verify start date comes first
-            LocalDate startDate = dateIter.next();
-            LocalDate currentDate = dateIter.next();
+            LocalDate startDate = nextDate();
+            LocalDate currentDate = nextDate();
             if (currentDate.isBefore(startDate)) {
                 portfolio.setStartDate(currentDate);
                 portfolio.setDate(startDate);
@@ -168,6 +168,10 @@ public class Mocker extends Random {
         return idStream;
     }
 
+    public Integer nextId() {
+        return idIter.next();
+    }
+
     public DoubleStream prices() {
         DoubleStream doubleStream = super.doubles(0, 400000);
         if (priceIter == null) {
@@ -176,12 +180,20 @@ public class Mocker extends Random {
         return doubleStream;
     }
 
+    public Double nextPrice() {
+        return priceIter.next();
+    }
+
     public DoubleStream cashes() {
         DoubleStream doubleStream = super.doubles(0, Double.MAX_VALUE);
         if (cashIter == null) {
             cashIter = doubleStream.iterator();
         }
         return doubleStream;
+    }
+
+    public Double nextCash() {
+        return cashIter.next();
     }
 
     public Stream<String> tickers() {
@@ -201,6 +213,10 @@ public class Mocker extends Random {
         return tickerStream;
     }
 
+    public String nextTicker() {
+        return tickerIter.next();
+    }
+
     public Stream<LocalDate> dates() {
         long epoch = LocalDate.EPOCH.toEpochDay();
         long now = LocalDate.now().toEpochDay();
@@ -210,5 +226,9 @@ public class Mocker extends Random {
             dateIter = dateStream.iterator();
         }
         return dateStream;
+    }
+
+    public LocalDate nextDate() {
+        return dateIter.next();
     }
 }
