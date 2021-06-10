@@ -141,7 +141,7 @@ public class Mocker extends Random {
         reseed();
         return BigDecimal.valueOf(
                 super.doubles(0, 400000).iterator().next()
-        ).setScale(2, RoundingMode.DOWN);
+        ).setScale(2, RoundingMode.HALF_UP);
     }
 
     public Stream<BigDecimal> cashes() {
@@ -153,7 +153,7 @@ public class Mocker extends Random {
         reseed();
         return BigDecimal.valueOf(
                 super.doubles(0, Double.MAX_VALUE).iterator().next()
-        ).setScale(2, RoundingMode.DOWN);
+        ).setScale(2, RoundingMode.HALF_UP);
     }
 
     public Stream<String> tickers() {

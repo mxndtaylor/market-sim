@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +25,7 @@ public class ClosingDBDao implements ClosingDao {
     @Transactional
     public Closing addMember(Closing closing) {
         final String ADD_MEMBER = "INSERT INTO Closings (Date, Ticker, Price) " +
-                "VALUES (?,?,TRUNCATE(?,2));";
+                "VALUES (?,?,?);";
         int rowsAffected = jdbc.update(ADD_MEMBER,
                 closing.getDate(),
                 closing.getTicker(),
@@ -61,7 +62,7 @@ public class ClosingDBDao implements ClosingDao {
     @Override
     @Transactional
     public boolean deleteMemberByKey(Closing key) {
-        final String DELETE_HOLDINGS = "DELETE FROM Holdings WHERE Date = ? AND Ticker = ?;";
+        final String DELETE_HOLDINGS = "DELETE FROM Holdings WHERE PurchaseDate = ? AND Ticker = ?;";
         jdbc.update(DELETE_HOLDINGS,
                 key.getDate(),
                 key.getTicker());
@@ -76,7 +77,7 @@ public class ClosingDBDao implements ClosingDao {
 
     @Override
     public boolean updateMember(Closing closing) {
-        final String UPDATE_MEMBER = "UPDATE Closings SET Price = TRUNCATE(?,2) " +
+        final String UPDATE_MEMBER = "UPDATE Closings SET Price = ? " +
                 "WHERE Date = ? AND Ticker = ?;";
         int rowsAffected = jdbc.update(UPDATE_MEMBER,
                 closing.getPrice().doubleValue(),
@@ -104,7 +105,8 @@ public class ClosingDBDao implements ClosingDao {
 
             closing.setDate(resultSet.getDate("Date").toLocalDate());
             closing.setTicker(resultSet.getString("Ticker"));
-            closing.setPrice(BigDecimal.valueOf(resultSet.getFloat("Price")).setScale(2,BigDecimal.ROUND_HALF_UP));
+            closing.setPrice(new BigDecimal(resultSet.getString("Price"))
+                    .setScale(2, RoundingMode.HALF_UP));
 
             return closing;
         }
