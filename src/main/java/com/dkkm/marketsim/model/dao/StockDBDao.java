@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceException;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -61,13 +62,13 @@ public class StockDBDao implements StockDao {
     @Override
     @Transactional
     public boolean deleteMemberByKey(String ticker) {
-        final String DELETE_HOLDINGS = "DELETE * FROM Holdings WHERE Ticker = ?;";
+        final String DELETE_HOLDINGS = "DELETE FROM Holdings WHERE Ticker = ?;";
         jdbc.update(DELETE_HOLDINGS, ticker);
 
-        final String DELETE_CLOSINGS = "DELETE * FROM Closings WHERE Ticker = ?;";
+        final String DELETE_CLOSINGS = "DELETE FROM Closings WHERE Ticker = ?;";
         jdbc.update(DELETE_CLOSINGS, ticker);
 
-        final String DELETE_MEMBER = "DELETE * FROM Stocks WHERE Ticker = ?";
+        final String DELETE_MEMBER = "DELETE FROM Stocks WHERE Ticker = ?";
         int rowsAffected = jdbc.update(DELETE_MEMBER, ticker);
         return rowsAffected == 1;
     }
@@ -90,8 +91,10 @@ public class StockDBDao implements StockDao {
             Stock stock = new Stock();
 
             stock.setTicker(resultSet.getString("Ticker"));
-            stock.setIpo(resultSet.getDate("IPODate").toLocalDate());
-
+            Date date = resultSet.getDate("IPODate");
+            if (date != null) {
+                stock.setIpo(date.toLocalDate());
+            }
             return stock;
         }
     }
