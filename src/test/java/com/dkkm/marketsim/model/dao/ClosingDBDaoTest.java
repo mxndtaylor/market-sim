@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -122,9 +123,9 @@ class ClosingDBDaoTest {
 
         List<Closing> preUpdateClosings = closingDao.getMembers();
 
-        double priceDelta = mocker.nextDouble();
+        BigDecimal priceDelta = BigDecimal.valueOf(mocker.nextDouble());
         Closing closingWithUpdates = new Closing(closingToBeUpdated.getDate(),
-                stock.getTicker(), closingToBeUpdated.getPrice() - priceDelta);
+                stock.getTicker(), closingToBeUpdated.getPrice().subtract(priceDelta));
 
 
         //when

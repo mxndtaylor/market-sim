@@ -1,5 +1,7 @@
 package com.dkkm.marketsim.model.dto;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.DoubleStream;
@@ -122,13 +124,14 @@ public class Mocker extends Random {
         return super.ints(0, Integer.MAX_VALUE).iterator().nextInt();
     }
 
-    public DoubleStream prices() {
-        DoubleStream doubleStream = super.doubles(0, 400000);
-        return doubleStream;
+    public Stream<BigDecimal> prices() {
+        return Stream.generate(this::nextPrice);
     }
 
-    public Double nextPrice() {
-        return super.doubles(0, 400000).iterator().next();
+    public BigDecimal nextPrice() {
+        return BigDecimal.valueOf(
+                super.doubles(0, 400000).iterator().next()
+        ).setScale(2, RoundingMode.DOWN);
     }
 
     public DoubleStream cashes() {
