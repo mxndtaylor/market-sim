@@ -5,6 +5,7 @@ import com.dkkm.marketsim.model.dto.Closing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Service
@@ -18,7 +19,7 @@ public class ClosingServiceImpl
     }
 
     @Override
-    public double getSharePrice(String ticker, LocalDate date) {
+    public BigDecimal getSharePrice(String ticker, LocalDate date) {
         Closing closing = new Closing();
         closing.setTicker(ticker);
         closing.setDate(date);

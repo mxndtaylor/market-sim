@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -103,7 +104,7 @@ public class ClosingDBDao implements ClosingDao {
 
             closing.setDate(resultSet.getDate("Date").toLocalDate());
             closing.setTicker(resultSet.getString("Ticker"));
-            closing.setPrice((double) resultSet.getFloat("Price"));
+            closing.setPrice(BigDecimal.valueOf(resultSet.getFloat("Price")).setScale(2,BigDecimal.ROUND_HALF_UP));
 
             return closing;
         }

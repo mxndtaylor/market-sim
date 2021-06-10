@@ -6,6 +6,7 @@ import com.dkkm.marketsim.model.dto.Portfolio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -86,7 +87,7 @@ public class PortfolioServiceImpl
         holding.setShareQuantity(remainingQuantity);
         int soldQuantity = holdingService.sellHoldingsByAggHolding(holding);
 
-        double shareValue = closingService.getSharePrice(ticker, portfolio.getDate());
+        double shareValue = closingService.getSharePrice(ticker, portfolio.getDate()).doubleValue();
         portfolio.setCash(portfolio.getCash() + soldQuantity * shareValue);
         dao.updateMember(portfolio);
         return soldQuantity;
@@ -96,7 +97,7 @@ public class PortfolioServiceImpl
     public int buyTickerQuantityForPortfolio(int portfolioId, String ticker, int buyQuantity) {
         Portfolio portfolio = dao.getMemberByKey(portfolioId);
 
-        double pricePerShare = closingService.getSharePrice(ticker, portfolio.getDate());
+        double pricePerShare = closingService.getSharePrice(ticker, portfolio.getDate()).doubleValue();
         int affordQuantity = (int) Math.floor(portfolio.getCash() / pricePerShare);
         int boughtQuantity = Math.min(buyQuantity, affordQuantity);
 

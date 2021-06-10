@@ -2,6 +2,7 @@ package com.dkkm.marketsim.model.dto;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -13,9 +14,9 @@ public class Closing {
     private LocalDate date;
     @NotNull
     @Min(0)
-    private Double price;
+    private BigDecimal price;
 
-    public Closing(LocalDate date, String symbol, Double close) {
+    public Closing(LocalDate date, String symbol, BigDecimal close) {
         this.date = date;
         this.ticker = symbol;
         this.price = close;
@@ -41,11 +42,11 @@ public class Closing {
         this.date = date;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
