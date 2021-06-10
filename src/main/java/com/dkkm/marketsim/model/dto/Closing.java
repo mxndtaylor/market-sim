@@ -16,10 +16,12 @@ public class Closing {
     @Min(0)
     private BigDecimal price;
 
-    public Closing(LocalDate date, String symbol, BigDecimal close) {
+    private Stock stock; // added by service layer
+
+    public Closing(LocalDate date, String symbol, BigDecimal price) {
         this.date = date;
         this.ticker = symbol;
-        this.price = close;
+        this.price = price;
     }
 
     public Closing() {

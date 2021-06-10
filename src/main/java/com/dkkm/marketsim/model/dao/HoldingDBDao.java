@@ -84,7 +84,7 @@ public class HoldingDBDao implements HoldingDao {
 
     @Override
     public boolean deleteMemberByKey(Holding key) {
-        final String DELETE_MEMBER = "DELETE * FROM Holdings WHERE " +
+        final String DELETE_MEMBER = "DELETE FROM Holdings WHERE " +
                 "PortfolioId = ? AND Ticker = ? AND PurchaseDate = ?;";
         int rowsAffected = jdbc.update(DELETE_MEMBER,
                 key.getPortfolioId(),

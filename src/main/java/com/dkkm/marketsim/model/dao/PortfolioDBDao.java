@@ -61,10 +61,10 @@ public class PortfolioDBDao implements PortfolioDao {
     @Override
     @Transactional
     public boolean deleteMemberByKey(Integer id) {
-        final String DELETE_HOLDINGS = "DELETE * FROM Holdings WHERE PortfolioId = ?;";
+        final String DELETE_HOLDINGS = "DELETE FROM Holdings WHERE PortfolioId = ?;";
         jdbc.update(DELETE_HOLDINGS, id);
 
-        final String DELETE_MEMBER = "DELETE * FROM Portfolios WHERE PortfolioId = ?;";
+        final String DELETE_MEMBER = "DELETE FROM Portfolios WHERE PortfolioId = ?;";
         int rowsAffected = jdbc.update(DELETE_MEMBER, id);
         return rowsAffected == 1;
     }

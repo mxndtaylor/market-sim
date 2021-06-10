@@ -1,23 +1,19 @@
 package com.dkkm.marketsim.model.dao;
 
 import com.dkkm.marketsim.model.dto.Stock;
-import com.dkkm.marketsim.model.dto.Stock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.PersistenceException;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-public class StockDBDao implements CrudDao<Stock, String> {
+public class StockDBDao implements StockDao {
 
     @Autowired
     private JdbcTemplate jdbc;
@@ -61,13 +57,13 @@ public class StockDBDao implements CrudDao<Stock, String> {
     @Override
     @Transactional
     public boolean deleteMemberByKey(String ticker) {
-        final String DELETE_HOLDINGS = "DELETE * FROM Holdings WHERE Ticker = ?;";
+        final String DELETE_HOLDINGS = "DELETE FROM Holdings WHERE Ticker = ?;";
         jdbc.update(DELETE_HOLDINGS, ticker);
 
-        final String DELETE_CLOSINGS = "DELETE * FROM Closings WHERE Ticker = ?;";
+        final String DELETE_CLOSINGS = "DELETE FROM Closings WHERE Ticker = ?;";
         jdbc.update(DELETE_CLOSINGS, ticker);
 
-        final String DELETE_MEMBER = "DELETE * FROM Stocks WHERE Ticker = ?";
+        final String DELETE_MEMBER = "DELETE FROM Stocks WHERE Ticker = ?";
         int rowsAffected = jdbc.update(DELETE_MEMBER, ticker);
         return rowsAffected == 1;
     }
@@ -90,10 +86,10 @@ public class StockDBDao implements CrudDao<Stock, String> {
             Stock stock = new Stock();
 
             stock.setTicker(resultSet.getString("Ticker"));
-            if(resultSet.getDate("IPODate") != null) {
-                stock.setIpo(resultSet.getDate("IPODate").toLocalDate());
+            Date date = resultSet.getDate("IPODate");
+            if (date != null) {
+                stock.setIpo(date.toLocalDate());
             }
-
             return stock;
         }
     }
