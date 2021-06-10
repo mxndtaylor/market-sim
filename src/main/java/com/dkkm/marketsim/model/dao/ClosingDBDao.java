@@ -29,13 +29,17 @@ public class ClosingDBDao implements ClosingDao {
                 closing.getTicker(),
                 closing.getPrice());
 
+        if (rowsAffected == 0) {
+            return null;
+        }
+
         return closing;
     }
 
     @Override
     public Closing getMemberByKey(Closing key) {
-        final String GET_MEMBER = "SELECT * FROM Closings WHERE Date = ?, Ticker = ?;";
-        Closing closing; // TODO: add error catching
+        final String GET_MEMBER = "SELECT * FROM Closings WHERE Date = ? AND Ticker = ?;";
+        Closing closing;
         closing = jdbc.queryForObject(GET_MEMBER, new ClosingMapper(),
                 key.getDate(),
                 key.getTicker());
@@ -46,7 +50,7 @@ public class ClosingDBDao implements ClosingDao {
     @Override
     public List<Closing> getMembers() {
         final String GET_ALL_MEMBERS = "SELECT * FROM Closings;";
-        List<Closing> closings; // TODO: add error catching
+        List<Closing> closings;
 
         closings = jdbc.query(GET_ALL_MEMBERS, new ClosingMapper());
 
@@ -56,12 +60,12 @@ public class ClosingDBDao implements ClosingDao {
     @Override
     @Transactional
     public boolean deleteMemberByKey(Closing key) {
-        final String DELETE_HOLDINGS = "DELETE * FROM Holdings WHERE Date = ?, Ticker = ?;";
+        final String DELETE_HOLDINGS = "DELETE * FROM Holdings WHERE Date = ? AND Ticker = ?;";
         jdbc.update(DELETE_HOLDINGS,
                 key.getDate(),
                 key.getTicker());
 
-        final String DELETE_MEMBER = "DELETE * FROM Closings WHERE Date = ?, Ticker = ?;";
+        final String DELETE_MEMBER = "DELETE * FROM Closings WHERE Date = ? AND Ticker = ?;";
         int rowsAffected = jdbc.update(DELETE_MEMBER,
                 key.getDate(),
                 key.getTicker());
@@ -72,7 +76,7 @@ public class ClosingDBDao implements ClosingDao {
     @Override
     public boolean updateMember(Closing closing) {
         final String UPDATE_MEMBER = "UPDATE Closings SET Price = ? " +
-                "WHERE Date = ?, Ticker = ?;";
+                "WHERE Date = ? AND Ticker = ?;";
         int rowsAffected = jdbc.update(UPDATE_MEMBER,
                 closing.getPrice(),
                 closing.getDate(),
@@ -85,7 +89,7 @@ public class ClosingDBDao implements ClosingDao {
     public List<Closing> getClosingsByDate(LocalDate date) {
         List<Closing> closings;
 
-        final String CLOSINGS_BY_DATE = "SELECT * FROM closings WHERE Date = ? ORDER BY Price;";
+        final String CLOSINGS_BY_DATE = "SELECT * FROM closings WHERE Date = ? ORDER BY Price DESC;";
         closings = jdbc.query(CLOSINGS_BY_DATE, new ClosingMapper(), Date.valueOf(date));
 
         return closings;

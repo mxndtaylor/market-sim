@@ -3,12 +3,15 @@ package com.dkkm.marketsim.model.dao;
 import com.dkkm.marketsim.model.dto.Stock;
 import com.dkkm.marketsim.model.dto.Stock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -29,7 +32,8 @@ public class StockDBDao implements CrudDao<Stock, String> {
                 stock.getIpo()
         );
 
-        if (rowsAffected == 1) { // TODO: add error catching
+        if (rowsAffected == 0) {
+            return null;
         }
 
         return stock;
@@ -38,7 +42,7 @@ public class StockDBDao implements CrudDao<Stock, String> {
     @Override
     public Stock getMemberByKey(String ticker) {
         final String GET_MEMBER = "SELECT * FROM Stocks WHERE Ticker = ?;";
-        Stock stock; // TODO: add error catching
+        Stock stock;
         stock = jdbc.queryForObject(GET_MEMBER, new StockMapper(), ticker);
 
         return stock;
@@ -47,7 +51,7 @@ public class StockDBDao implements CrudDao<Stock, String> {
     @Override
     public List<Stock> getMembers() {
         final String GET_ALL_MEMBERS = "SELECT * FROM Stocks;";
-        List<Stock> stocks; // TODO: add error catching
+        List<Stock> stocks;
 
         stocks = jdbc.query(GET_ALL_MEMBERS, new StockMapper());
 

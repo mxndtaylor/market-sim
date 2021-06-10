@@ -32,6 +32,8 @@ public class PortfolioDBDao implements PortfolioDao {
             final String GET_LAST_ID = "SELECT LAST_INSERT_ID();";
             int id = jdbc.queryForObject(GET_LAST_ID, Integer.class);
             portfolio.setId(id);
+        } else {
+            return null;
         }
 
         return portfolio;
@@ -40,7 +42,7 @@ public class PortfolioDBDao implements PortfolioDao {
     @Override
     public Portfolio getMemberByKey(Integer id) {
         final String GET_MEMBER = "SELECT * FROM Portfolios WHERE PortfolioId = ?;";
-        Portfolio portfolio; // TODO: add error catching
+        Portfolio portfolio;
         portfolio = jdbc.queryForObject(GET_MEMBER, new PortfolioMapper(), id);
 
         return portfolio;
@@ -49,7 +51,7 @@ public class PortfolioDBDao implements PortfolioDao {
     @Override
     public List<Portfolio> getMembers() {
         final String GET_ALL_MEMBERS = "SELECT * FROM Portfolios;";
-        List<Portfolio> portfolios; // TODO: add error catching
+        List<Portfolio> portfolios;
 
         portfolios = jdbc.query(GET_ALL_MEMBERS, new PortfolioMapper());
 
@@ -59,7 +61,7 @@ public class PortfolioDBDao implements PortfolioDao {
     @Override
     @Transactional
     public boolean deleteMemberByKey(Integer id) {
-        final String DELETE_HOLDINGS = "DELETE * FROM Holings WHERE PortfolioId = ?;";
+        final String DELETE_HOLDINGS = "DELETE * FROM Holdings WHERE PortfolioId = ?;";
         jdbc.update(DELETE_HOLDINGS, id);
 
         final String DELETE_MEMBER = "DELETE * FROM Portfolios WHERE PortfolioId = ?;";
