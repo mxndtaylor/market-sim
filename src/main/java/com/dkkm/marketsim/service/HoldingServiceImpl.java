@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HoldingServiceImpl
@@ -38,7 +39,7 @@ public class HoldingServiceImpl
         }
 
         // clunky? TODO: rework the conversion to a list
-        return holdingsByTicker.values().stream().toList();
+        return holdingsByTicker.values().stream().collect(Collectors.toList());
     }
 
     @Override

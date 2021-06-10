@@ -1,22 +1,23 @@
 package com.dkkm.marketsim.controller;
 
+import com.dkkm.marketsim.model.dao.ClosingDao;
+import com.dkkm.marketsim.model.dao.StockDBDao;
+import com.dkkm.marketsim.model.dto.Closing;
 import com.dkkm.marketsim.model.dto.Data;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.dkkm.marketsim.model.dto.Stock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tickers")
@@ -27,27 +28,53 @@ public class MarketStackController {
 
     @Autowired
     private RestTemplate restTemplate;
-/*
-    @RequestMapping("/{ticker}")
-    public Closing getClosingInfo(@PathVariable("ticker") String ticker) {
-        Data data = restTemplate.getForObject(
-          "http://api.marketstack.com/v1/eod?access_key=" + apiKey + "&symbols=" + ticker, Data.class
-        );
-        return new Closing(data.getDate(), data.getSymbol(), data.getClose());
+
+    @Autowired
+    private ClosingDao closingDao;
+
+    @Autowired
+    private StockDBDao stockDao;
+
+    @RequestMapping("/initDB")
+    public void initDB() {
+        String[] tickers = initStocks();
+
+        for(int i = 0; i < tickers.length; i++) {
+            setTickerData(tickers[i]);
+        }
     }
-*/
-    @RequestMapping("/{ticker}")
-    public Data getTickerData(@PathVariable("ticker") String ticker) {
+
+    @RequestMapping("/initStocks")
+    public String[] initStocks(){
+        String[] tickers = {"AAPL", "TSLA", "NFLX", "INTC", "AMD", "WMT", "F", "GME", "BB", "AMC", "HD", "BAC", "DIS", "HON", "BA", "COP"};
+        for(int i = 0; i < tickers.length; i++) {
+            Stock stock = new Stock();
+            stock.setTicker(tickers[i]);
+            stockDao.addMember(stock);
+        }
+        return tickers;
+    }
+
+    @RequestMapping("/addToClosings/{ticker}")
+    public void setTickerData(@PathVariable("ticker") String ticker) {
         Object response = restTemplate.getForObject(
                 "http://api.marketstack.com/v1/eod?access_key=" + apiKey + "&symbols=" + ticker, Object.class
         );
         Data data = new Data();
         data.setData((Map<String, Object>) response);
         data.setDataList((ArrayList<Map<String, Object>>) data.getData().get("data"));
-        double close = (double) data.getDataList().get(0).get("close");
-        String symbol = (String) data.getDataList().get(0).get("symbol");
-        String date = (String) data.getDataList().get(0).get("date");
-        return data;
+        for(int i = 0; i < 30; i++) {
+            double close = (double) data.getDataList().get(i).get("close");
+            String symbol = (String) data.getDataList().get(i).get("symbol");
+            DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
+            LocalDateTime localDateTime = LocalDateTime.parse((String)data.getDataList().get(i).get("date"),format);
+            LocalDate date = localDateTime.toLocalDate();
+            Closing closing = new Closing();
+            closing.setTicker(symbol);
+            closing.setDate(date);
+            closing.setPrice(close);
+            closingDao.addMember(closing);
+        }
     }
     @Bean
     public RestTemplate restTemplate() {
