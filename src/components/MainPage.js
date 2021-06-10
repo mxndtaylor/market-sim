@@ -2,31 +2,18 @@ import React, {Component} from 'react';
 import './MainPage.css';
 import {Container, Row, Col, Card, Button} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Link } from 'react-router-dom';
 
-function formatDate(date) {
-    var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getUTCDate(),
-        year = d.getFullYear();
-  
-    if (month.length < 2) 
-        month = '0' + month;
-    if (day.length < 2) 
-        day = '0' + day;
-  
-    return [month, day, year].join('-');
-  }
+
 
 const StocksHeld = () => {
     return (
-        <Card style={{ width: '14rem'}}>
+        <Card >
             <Card.Header>Ticker</Card.Header>
             <Card.Body>
                 <Row>
                     <Col>
                         <Card.Text>
-                            Price -- Number of shares: 
+                            Price: $10 Number of shares: 1 
                         </Card.Text>
                     </Col>
                     <Col>
@@ -42,7 +29,22 @@ const StocksHeld = () => {
     )
 }
 
-const StockCard = ({dummyStock}) => {
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+  
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+  
+    return [month, day, year].join('-');
+  }
+
+
+  const StockCard = ({dummyStock}) => {
     return (
         <Card style={{ width: '18rem' }}>
             <Card.Header>{dummyStock.ticker}</Card.Header>
@@ -69,16 +71,15 @@ const StockCard = ({dummyStock}) => {
 class MainPage extends Component {
     constructor(props) {
         super(props)
-        console.log(this.props)
     }
 
     render() {
-        console.log(this.props)
+        console.log("Main page loaded")
         return (
             <Container fluid>
                 <Row>
-                    {console.log(this.props.location.chosenDate)}
-                    <h1 className = "text-center">{formatDate(this.props.location.chosenDate)}</h1>
+    
+                    <h1 className = "text-center">{formatDate(this.props.chosenDate)}</h1>
                 </Row>
                 <hr/>
                 <Row>
@@ -99,27 +100,31 @@ class MainPage extends Component {
                         <hr />
                         <Row>
                             <Col>
-                                <h3>MONEY WE HAVE</h3>
+                                <h3 align ="center">Budget:{'\u00A0'}{this.props.budget}</h3>
                             </Col>
                             <Col>
-                                <h3>PROFIT </h3>
+                                <h3 align ="center">Profit:{'\u00A0'}{this.props.profit} </h3>
                             </Col>
                         </Row>
+
                         <div className="cards" id = "box" name = "box">
+
                             <Row>
-                            {this.props.location.dummyStocks.map((dummyStock,i) => {
-                                return <StockCard dummyStock = {dummyStock} key = {i}  /> 
-                                })}
-                            </Row>
+                                    {this.props.dummyStocks.map((dummyStock,i) => {
+                                        return <StockCard dummyStock = {dummyStock} key = {i}  /> 
+                                        })}
+                            </Row>   
+
                         </div>
                     </Col>
                     <Col sm = {2}>
                         <div className = "btn-arrow" id="arrowButton" name="arrowButton">
-                            <Button variant = "secondary" size="lg" onClick={this.props.location.handleNextDay}>
+                            <Button variant = "secondary" size="lg" onClick={this.props.handleNextDay}  >
+                                Next Day
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
                                 </svg>
-                                Next Day
+                                
                             </Button>
                         </div>
                     </Col>

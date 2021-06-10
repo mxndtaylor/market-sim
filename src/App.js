@@ -1,9 +1,9 @@
-import './App.css';
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
 import {Container, Row, Col} from "react-bootstrap";
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
 import MainPage from './components/MainPage'
+
 
 function formatDate(date) {
   var d = new Date(date),
@@ -19,15 +19,10 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-Date.prototype.addDays = function(days) {
-  var date = new Date(this.valueOf());
-  date.setDate(date.getDate() + days);
-  return date;
-}
 
 class App extends Component {
-
   constructor(props) {
+
     super(props)
     var curr = new Date();
     curr.setDate(curr.getDate());
@@ -129,11 +124,15 @@ class App extends Component {
         ticker: "TSLA",
         price: 200
       }
-      ]
+      ],
+      gameStart:false,
+      budget: 1000,
+      profit: 0
     }
 
   }
 
+  //The Date Change From Game Start Calendar
   handleDateChange = (event) => {
     let inputName = event.target.name
     let inputValue = event.target.value
@@ -146,24 +145,43 @@ class App extends Component {
       this.setState ({
         currentDate: dateInfo
       })
+      
     }
-  
-  handleNextDayChange = () => {
-    console.log('Changing next day')
 
-    var dateToBeChanged = new Date(this.state.currentDate)
-    var date = dateToBeChanged.addDays(1)
-    date = formatDate(date)
-    console.log(date)
+  gameStart = () =>{
+      this.setState({
+        gameStart:true
+      })
+  }
+
+  
+
+  handleNextDayChange = () => {
+    // console.log('Changing next day')
+    var date = new Date(this.state.currentDate);
+    // console.log("Before: "+date)
+    date.setDate(date.getDate()+1);
+    // console.log("After: "+date)
+    let newProfit = this.state.profit + 3;
+    let newBudget = this.state.budget + 5;
     this.setState({
-      currentDate: date
-    })
+      currentDate: date,
+      profit: newProfit,
+      budget: newBudget
+    }, function(){
+      console.log("new state check:" + this.state.currentDate)
+  }
+    );
   }
   
 
+  
   render() {
     return (
-      <Container fluid>
+      //Master Div
+      <div>
+        
+        {!this.state.gameStart ? <Container fluid>
         <Row>
           <Col>
               <h1 className = "text-center">Market Simulator</h1>
@@ -179,19 +197,27 @@ class App extends Component {
                         value = {this.state.currentDate} onChange={this.handleDateChange}></input>
               </Col>
               <Col md={{ offset: 1 }}>
-                GAME STATS
-                {/* <div hidden>
-                  <MainPage dummyStocks = {this.state.dummyStocks}/>
-                </div> */}
-                <Link to={{pathname: "/components/MainPage",
-                            dummyStocks: this.state.dummyStocks,
-                            chosenDate: this.state.currentDate,
-                            handleNextDay: this.handleNextDayChange}} >Start Game</Link>
+              <button onClick={this.gameStart}>
+          START
+        </button> 
               </Col>
             </Row>
           </Col>
         </Row>
-      </Container>
+      </Container> : null }
+
+      {this.state.gameStart ? <Container fluid>
+        <MainPage
+            dummyStocks={this.state.dummyStocks}
+            chosenDate = {this.state.currentDate}
+            handleNextDay={this.handleNextDayChange}
+            budget = {this.state.budget}
+            profit = {this.state.profit}
+        />
+      </Container> : null}
+
+      </div>
+
     );
   }
 }

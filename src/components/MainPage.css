@@ -1,5 +1,5 @@
 #box {
-    width: 1200px;
+
     margin-right: auto;
     margin-left: 50px;
     background-color: white;
@@ -19,7 +19,7 @@ h2 {
 
 #collection {
     margin-top: 60px;
-    width: 200px;
+    /* width: 200px; */
     margin-right: auto;
     margin-left: 50px;
     background-color: white;
