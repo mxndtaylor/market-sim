@@ -68,8 +68,17 @@ class ClosingDBDaoTest {
         //given
         final int LIST_LENGTH = 50 - mocker.nextInt(50);
         List<Closing> closings = mocker.closings().limit(LIST_LENGTH).collect(Collectors.toList());
+        Set<String> tickers = new HashSet<>();
         for (Closing closing : closings) {
             Stock stock = closing.getStock();
+
+            // avoid duplicate keys
+            while (tickers.contains(stock.getTicker())) {
+                stock = mocker.nextStock();
+            }
+            closing.setTicker(stock.getTicker());
+            tickers.add(stock.getTicker());
+
             stockDao.addMember(stock);
             closingDao.addMember(closing);
         }
@@ -87,8 +96,17 @@ class ClosingDBDaoTest {
         //given
         final int LIST_LENGTH = 50 - mocker.nextInt(50);
         List<Closing> closings = mocker.closings().limit(LIST_LENGTH).collect(Collectors.toList());
+        Set<String> tickers = new HashSet<>();
         for (Closing closing : closings) {
             Stock stock = closing.getStock();
+
+            // avoid duplicate keys
+            while (tickers.contains(stock.getTicker())) {
+                stock = mocker.nextStock();
+            }
+            closing.setTicker(stock.getTicker());
+            tickers.add(stock.getTicker());
+
             stockDao.addMember(stock);
             closingDao.addMember(closing);
         }
@@ -97,17 +115,14 @@ class ClosingDBDaoTest {
 
         //when
         boolean deleteSucceeded = closingDao.deleteMemberByKey(closingToDelete);
-        Closing shouldBeNull = closingDao.getMemberByKey(closingToDelete);
         List<Closing> postDeleteClosings = closingDao.getMembers();
 
         //then
+        assertTrue(preDeleteClosings.contains(closingToDelete));
         if (deleteSucceeded) {
-            assertNull(shouldBeNull);
             assertEquals(LIST_LENGTH - 1, postDeleteClosings.size());
             assertFalse(postDeleteClosings.contains(closingToDelete));
         } else {
-            assertNotNull(shouldBeNull);
-            assertEquals(closingToDelete, shouldBeNull);
             assertEquals(LIST_LENGTH, postDeleteClosings.size());
             assertTrue(postDeleteClosings.contains(closingToDelete));
         }
@@ -167,16 +182,25 @@ class ClosingDBDaoTest {
         final LocalDate dateToSearchBy = mocker.nextDate();
         List<Closing> closings = mocker.closings().limit(LIST_LENGTH).collect(Collectors.toList());
         List<Closing> expectedClosingsByDate = new ArrayList<>();
+        Set<String> tickers = new HashSet<>();
         for (Closing closing : closings) {
             Stock stock = closing.getStock();
+
+            while (tickers.contains(stock.getTicker())) {
+                stock = mocker.nextStock();
+            }
+            closing.setTicker(stock.getTicker());
+            tickers.add(stock.getTicker());
+
             stockDao.addMember(stock);
 
             if (mocker.nextBoolean()) {
                 closing.setDate(dateToSearchBy);
                 closing = closingDao.addMember(closing);
                 expectedClosingsByDate.add(closing);
+            } else {
+                closingDao.addMember(closing);
             }
-            closingDao.addMember(closing);
         }
 
         //when
