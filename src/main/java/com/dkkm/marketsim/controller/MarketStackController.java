@@ -17,7 +17,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/tickers")
@@ -36,12 +38,13 @@ public class MarketStackController {
     private StockDBDao stockDao;
 
     @RequestMapping("/initDB")
-    public void initDB() {
+    public List<Stock> initDB() {
         String[] tickers = initStocks();
 
         for(int i = 0; i < tickers.length; i++) {
             setTickerData(tickers[i]);
         }
+        return stockDao.getMembers();
     }
 
     @RequestMapping("/initStocks")

@@ -90,7 +90,9 @@ public class StockDBDao implements CrudDao<Stock, String> {
             Stock stock = new Stock();
 
             stock.setTicker(resultSet.getString("Ticker"));
-            stock.setIpo(resultSet.getDate("IPODate").toLocalDate());
+            if(resultSet.getDate("IPODate") != null) {
+                stock.setIpo(resultSet.getDate("IPODate").toLocalDate());
+            }
 
             return stock;
         }
