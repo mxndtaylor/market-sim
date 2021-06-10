@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -37,8 +38,8 @@ public class PortfolioServiceImpl
             portfolio.setStartDate(currentDate);
         }
 
-        Double currentCash = portfolio.getCash();
-        Double startCash = portfolio.getStartCash();
+        BigDecimal currentCash = portfolio.getCash();
+        BigDecimal startCash = portfolio.getStartCash();
         if (startCash != null) {
             portfolio.setCash(startCash);
         } else if (currentCash != null) {
@@ -85,20 +86,22 @@ public class PortfolioServiceImpl
         int remainingQuantity = Math.max(0, initialQuantity - sellQuantity);
 
         holding.setShareQuantity(remainingQuantity);
-        int soldQuantity = holdingService.sellHoldingsByAggHolding(holding);
+        BigDecimal soldQuantity = BigDecimal.valueOf(holdingService.sellHoldingsByAggHolding(holding));
 
-        double shareValue = closingService.getSharePrice(ticker, portfolio.getDate()).doubleValue();
-        portfolio.setCash(portfolio.getCash() + soldQuantity * shareValue);
+        BigDecimal shareValue = closingService.getSharePrice(ticker, portfolio.getDate());
+        portfolio.setCash(portfolio.getCash()
+                                    .add(shareValue
+                                            .multiply(soldQuantity)));
         dao.updateMember(portfolio);
-        return soldQuantity;
+        return soldQuantity.intValue();
     }
 
     @Override
     public int buyTickerQuantityForPortfolio(int portfolioId, String ticker, int buyQuantity) {
         Portfolio portfolio = dao.getMemberByKey(portfolioId);
 
-        double pricePerShare = closingService.getSharePrice(ticker, portfolio.getDate()).doubleValue();
-        int affordQuantity = (int) Math.floor(portfolio.getCash() / pricePerShare);
+        BigDecimal pricePerShare = closingService.getSharePrice(ticker, portfolio.getDate());
+        int affordQuantity = portfolio.getCash().divide(pricePerShare, RoundingMode.DOWN).intValueExact();
         int boughtQuantity = Math.min(buyQuantity, affordQuantity);
 
         Holding holding = new Holding();

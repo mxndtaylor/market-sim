@@ -31,12 +31,17 @@ public class Mocker extends Random {
         this(new Random().nextLong());
     }
 
+    private void reseed() {
+        super.setSeed(nextLong());
+    }
+
     public Stream<Stock> stocks() {
         Stream<Stock> stockStream = Stream.generate(this::nextStock);
         return stockStream;
     }
 
     public Stock nextStock() {
+        reseed();
         Stock stock = new Stock();
         stock.setTicker(nextTicker());
         stock.setIpo(nextDate());
@@ -49,6 +54,7 @@ public class Mocker extends Random {
     }
 
     public Closing nextClosing() {
+        reseed();
         Closing closing = new Closing();
         closing.setDate(nextDate());
         closing.setPrice(nextPrice());
@@ -67,6 +73,7 @@ public class Mocker extends Random {
     }
 
     public Holding nextHolding() {
+        reseed();
         Holding holding = new Holding();
         holding.setPortfolioId(nextPortfolio().getId());
         holding.setShareQuantity(nextId());
@@ -86,6 +93,7 @@ public class Mocker extends Random {
     }
 
     public Portfolio nextPortfolio() {
+        reseed();
         Portfolio portfolio = new Portfolio();
         portfolio.setId(nextId());
 
@@ -121,6 +129,7 @@ public class Mocker extends Random {
     }
 
     public Integer nextId() {
+        reseed();
         return super.ints(0, Integer.MAX_VALUE).iterator().nextInt();
     }
 
@@ -129,26 +138,31 @@ public class Mocker extends Random {
     }
 
     public BigDecimal nextPrice() {
+        reseed();
         return BigDecimal.valueOf(
                 super.doubles(0, 400000).iterator().next()
         ).setScale(2, RoundingMode.DOWN);
     }
 
-    public DoubleStream cashes() {
-        DoubleStream doubleStream = super.doubles(0, Double.MAX_VALUE);
-        return doubleStream;
+    public Stream<BigDecimal> cashes() {
+        reseed();
+        return Stream.generate(this::nextCash);
     }
 
-    public Double nextCash() {
-        return super.doubles(0, Double.MAX_VALUE).iterator().next();
+    public BigDecimal nextCash() {
+        reseed();
+        return BigDecimal.valueOf(
+                super.doubles(0, Double.MAX_VALUE).iterator().next()
+        ).setScale(2, RoundingMode.DOWN);
     }
 
     public Stream<String> tickers() {
-        Stream<String> tickerStream = Stream.generate(this::nextTicker);
-        return tickerStream;
+        return Stream.generate(this::nextTicker);
     }
 
     public String nextTicker() {
+        reseed();
+
         int asciiMin = 65; // ascii code for A
         int asciiMax = 90; // ascii code for Z
         int tickerLength = 4 - super.nextInt(4);
@@ -166,6 +180,8 @@ public class Mocker extends Random {
     }
 
     public LocalDate nextDate() {
+        reseed();
+
         long epoch = LocalDate.EPOCH.toEpochDay();
         long now = LocalDate.now().toEpochDay();
         long epochDay = super.longs(epoch, now).limit(1).iterator().nextLong();

@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -21,12 +23,12 @@ public class PortfolioDBDao implements PortfolioDao {
     @Transactional
     public Portfolio addMember(Portfolio portfolio) {
         final String ADD_MEMBER = "INSERT INTO Portfolios (Date, Cash, StartDate, StartCash) " +
-                "VALUES (?,?,?,?);";
+                "VALUES (?,TRUNCATE(?,2),?,TRUNCATE(?,2));";
         int rowsAffected = jdbc.update(ADD_MEMBER,
                 portfolio.getDate(),
-                portfolio.getCash(),
+                portfolio.getCash().doubleValue(),
                 portfolio.getStartDate(),
-                portfolio.getStartCash());
+                portfolio.getStartCash().doubleValue());
 
         if (rowsAffected == 1) {
             final String GET_LAST_ID = "SELECT LAST_INSERT_ID();";
@@ -71,13 +73,13 @@ public class PortfolioDBDao implements PortfolioDao {
 
     @Override
     public boolean updateMember(Portfolio portfolio) {
-        final String UPDATE_MEMBER = "UPDATE Portfolios SET Date = ?, Cash = ?, StartDate = ?, StartCash = ? " +
-                "WHERE PortfolioId = ?;";
+        final String UPDATE_MEMBER = "UPDATE Portfolios SET Date = ?, Cash = TRUNCATE(?,2), " +
+                "StartDate = ?, StartCash = TRUNCATE(?,2) WHERE PortfolioId = ?;";
         int rowsAffected = jdbc.update(UPDATE_MEMBER,
                 portfolio.getDate(),
-                portfolio.getCash(),
+                portfolio.getCash().doubleValue(),
                 portfolio.getStartDate(),
-                portfolio.getStartCash(),
+                portfolio.getStartCash().doubleValue(),
                 portfolio.getId());
 
         return rowsAffected == 1;
@@ -90,8 +92,10 @@ public class PortfolioDBDao implements PortfolioDao {
             Portfolio portfolio = new Portfolio();
 
             portfolio.setId(resultSet.getInt("PortfolioId"));
-            portfolio.setCash((double) resultSet.getFloat("Cash"));
-            portfolio.setStartCash((double) resultSet.getFloat("StartCash"));
+            portfolio.setCash(BigDecimal.valueOf(resultSet.getFloat("Cash"))
+                    .setScale(2, RoundingMode.HALF_UP));
+            portfolio.setStartCash(BigDecimal.valueOf(resultSet.getFloat("StartCash"))
+                    .setScale(2, RoundingMode.HALF_UP));
             portfolio.setDate(resultSet.getDate("Date").toLocalDate());
             portfolio.setStartDate(resultSet.getDate("StartDate").toLocalDate());
 

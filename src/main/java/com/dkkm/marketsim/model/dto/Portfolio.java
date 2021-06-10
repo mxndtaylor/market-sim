@@ -2,6 +2,8 @@ package com.dkkm.marketsim.model.dto;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -14,14 +16,12 @@ public class Portfolio {
     @NotNull
     private LocalDate date;
     @NotNull
-    @Min(0)
-    private Double cash;
+    private BigDecimal cash;
 
     @NotNull
     private LocalDate startDate;
     @NotNull
-    @Min(0)
-    private Double startCash;
+    private BigDecimal startCash;
 
     private List<Holding> holdings; // Added by service layer
 
@@ -41,12 +41,13 @@ public class Portfolio {
         this.date = date;
     }
 
-    public Double getCash() {
-        return cash;
+
+    public BigDecimal getStartCash() {
+        return startCash.setScale(2, RoundingMode.HALF_UP);
     }
 
-    public void setCash(Double cash) {
-        this.cash = cash;
+    public void setStartCash(BigDecimal startCash) {
+        this.startCash = startCash.setScale(2, RoundingMode.HALF_UP);
     }
 
     public LocalDate getStartDate() {
@@ -57,12 +58,12 @@ public class Portfolio {
         this.startDate = startDate;
     }
 
-    public Double getStartCash() {
-        return startCash;
+    public BigDecimal getCash() {
+        return cash.setScale(2, RoundingMode.HALF_UP);
     }
 
-    public void setStartCash(Double startCash) {
-        this.startCash = startCash;
+    public void setCash(BigDecimal cash) {
+        this.cash = cash.setScale(2, RoundingMode.HALF_UP);
     }
 
     public List<Holding> getHoldings() {

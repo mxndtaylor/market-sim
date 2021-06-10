@@ -28,7 +28,7 @@ public class ClosingDBDao implements ClosingDao {
         int rowsAffected = jdbc.update(ADD_MEMBER,
                 closing.getDate(),
                 closing.getTicker(),
-                closing.getPrice());
+                closing.getPrice().doubleValue());
 
         if (rowsAffected == 0) {
             return null;
@@ -79,7 +79,7 @@ public class ClosingDBDao implements ClosingDao {
         final String UPDATE_MEMBER = "UPDATE Closings SET Price = TRUNCATE(?,2) " +
                 "WHERE Date = ? AND Ticker = ?;";
         int rowsAffected = jdbc.update(UPDATE_MEMBER,
-                closing.getPrice(),
+                closing.getPrice().doubleValue(),
                 closing.getDate(),
                 closing.getTicker());
 
