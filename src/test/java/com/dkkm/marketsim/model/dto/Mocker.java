@@ -182,7 +182,7 @@ public class Mocker extends Random {
     public LocalDate nextDate() {
         reseed();
 
-        long epoch = LocalDate.EPOCH.toEpochDay();
+        long epoch = LocalDate.now().toEpochDay();
         long now = LocalDate.now().toEpochDay();
         long epochDay = super.longs(epoch, now).limit(1).iterator().nextLong();
         return LocalDate.ofEpochDay(epochDay);
