@@ -3,6 +3,7 @@ package com.dkkm.marketsim.model.dto;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -16,10 +17,12 @@ public class Closing {
     @Min(0)
     private BigDecimal price;
 
-    public Closing(LocalDate date, String symbol, BigDecimal close) {
+    private Stock stock; // added by service layer
+
+    public Closing(LocalDate date, String symbol, BigDecimal price) {
         this.date = date;
         this.ticker = symbol;
-        this.price = close;
+        this.price = price.setScale(2, RoundingMode.HALF_UP);
     }
 
     public Closing() {
@@ -43,11 +46,19 @@ public class Closing {
     }
 
     public BigDecimal getPrice() {
-        return price;
+        return price.setScale(2, RoundingMode.HALF_UP);
     }
 
     public void setPrice(BigDecimal price) {
-        this.price = price;
+        this.price = price.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
 
     @Override

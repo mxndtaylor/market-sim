@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -80,7 +81,7 @@ public class MarketStackController {
             Closing closing = new Closing();
             closing.setTicker(symbol);
             closing.setDate(date);
-            closing.setPrice(new BigDecimal(close).setScale(2, BigDecimal.ROUND_HALF_UP));
+            closing.setPrice(new BigDecimal(close).setScale(2, RoundingMode.HALF_UP));
             closingDao.addMember(closing);
         }
     }
