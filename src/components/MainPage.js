@@ -6,15 +6,16 @@ import APIService from '../APIService'
 
 
 
-const StocksHeld = () => {
+const StocksHeld = ({inPortfolio, handleSharesSell}) => {
+    console.log(inPortfolio)
     return (
         <Card id = "stockDisplay" name = "stockDisplay">
-            <Card.Header>Ticker</Card.Header>
+            <Card.Header>{inPortfolio[0].ticker}</Card.Header>
             <Card.Body>
                 <Row>
                     <Col>
                         <Card.Text>
-                            Price: $10 Number of shares: 1 
+                            ${inPortfolio[0].price} Number of shares: {inPortfolio[1]}
                         </Card.Text>
                     </Col>
                     <Col>
@@ -23,6 +24,10 @@ const StocksHeld = () => {
                             <path d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.003V15h1.043v-1.216c2.27-.179 3.678-1.438 3.678-3.3 0-1.59-.947-2.51-2.956-3.028l-.722-.187V3.467c1.122.11 1.879.714 2.07 1.616h1.47c-.166-1.6-1.54-2.748-3.54-2.875V1H7.591v1.233c-1.939.23-3.27 1.472-3.27 3.156 0 1.454.966 2.483 2.661 2.917l.61.162v4.031c-1.149-.17-1.94-.8-2.131-1.718H4zm3.391-3.836c-1.043-.263-1.6-.825-1.6-1.616 0-.944.704-1.641 1.8-1.828v3.495l-.2-.05zm1.591 1.872c1.287.323 1.852.859 1.852 1.769 0 1.097-.826 1.828-2.2 1.939V8.73l.348.086z"/>
                             </svg>
                         </Button>
+                        <Form>
+                            <Form.Control type="text" placeholder="# of shares" name="numSharesSell"
+                             onChange={handleSharesSell} />
+                        </Form>
                     </Col>
                 </Row>
             </Card.Body>
@@ -59,7 +64,7 @@ function formatDate(date) {
                         <Row>
                             <Form>
                             <Form.Control type="text" placeholder="# of shares" name="numShares"
-                                value = {numShares} onChange={handleSharesChange} />
+                                         onChange={handleSharesChange} />
                             </Form>
                             <Button variant="light" onClick={() => handleBuyShares(myKey,numShares)}><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-piggy-bank" viewBox="0 0 16 16">
                                 <path d="M5 6.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0zm1.138-1.496A6.613 6.613 0 0 1 7.964 4.5c.666 0 1.303.097 1.893.273a.5.5 0 0 0 .286-.958A7.602 7.602 0 0 0 7.964 3.5c-.734 0-1.441.103-2.102.292a.5.5 0 1 0 .276.962z"/>
@@ -78,9 +83,7 @@ class MainPage extends Component {
     constructor(props) {
         super(props)
     }
-
     render() {
-        console.log("Main page loaded")
         return (
             <Container fluid>
                 <Row>
@@ -97,14 +100,11 @@ class MainPage extends Component {
                                                 numshares = {this.props.numShares} handleSharesChange = {this.props.handleSharesChange}  
                                                 handleBuyShares = {this.props.handleBuyShares}/> 
                                         })} */}
-                            <StocksHeld />
-                            <StocksHeld />
-                            <StocksHeld />
-                            <StocksHeld />
-                            <StocksHeld />
-                            <StocksHeld />
-                            <StocksHeld />
-                            <StocksHeld />
+                            {this.props.portfolio.map((inPortfolio,i) => {
+                                        return <StocksHeld  inPortfolio = {inPortfolio} myKey = {i} key = {i}
+                                                            handleSharesSell = {this.props.handleSharesSell}   /> 
+                                        })}
+                            {/* <StocksHeld portfolio = {this.props.portfolio} handleSharesSell = {this.props.handleSharesSell}/> */}
                         </div>
                     </Col>
                     <Col sm = {8}>
@@ -124,7 +124,7 @@ class MainPage extends Component {
                             <Row>
                                     {this.props.dummyStocks.map((dummyStock,i) => {
                                         return <StockCard dummyStock = {dummyStock} myKey = {i} key = {i}
-                                                numshares = {this.props.numShares} handleSharesChange = {this.props.handleSharesChange}  
+                                                handleSharesChange = {this.props.handleSharesChange}  
                                                 handleBuyShares = {this.props.handleBuyShares} /> 
                                         })}
                             </Row>   

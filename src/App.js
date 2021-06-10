@@ -33,6 +33,20 @@ function formatDateForNext(date) {
   return [year, month, day].join('-');
 }
 
+function findTicker(stocksHeld, ticker){
+  if(stocksHeld.length == 0){
+    return -1
+  }
+  for( var i = 0; i < stocksHeld.length; i++){
+    let curStockTicker = stocksHeld[i][0].ticker
+    if(curStockTicker === ticker){ //where ticker is held
+      return i;
+    }
+  }
+  return -1
+}
+
+var rNumShares = 0
 
 class App extends Component {
   constructor(props) {
@@ -147,9 +161,8 @@ class App extends Component {
       gameStart:false,
       budget: 1000,
       profit: 0,
-      numShares: 0,
-      stocksHeld: []
-
+      portfolio: [],
+      profitLoss: 0
     }
 
   }
@@ -183,32 +196,10 @@ class App extends Component {
       })
       console.log(this.state.stocks)
     })
-
   }
-
-  // getPriceByDate () {
-  //   APIService.getPricesByDate(this.state.currentDate) 
-  //     .then(res => {
-
-  //     })
-    
-  // }
-
-
-  // componentDidMount() {
-  //   APIService.initializeStocks()
-  //   .then(res => {
-  //     console.log(res)
-  //     this.setState ({
-  //       stocks: res.data
-  //     })
-  //     console.log(this.state.stocks)
-  //   })
-  // }
   
 
   handleNextDayChange = () => {
-    // console.log('Changing next day')
     var date = new Date(this.state.currentDate);
     console.log("Before: "+date)
     date.setDate(date.getDate()+1);
@@ -234,30 +225,46 @@ class App extends Component {
     })
   }
   
+  handleSharesSell = (event) => {
+    let inputName = event.target.name;
+    let inputValue = event.target.value;
+  
+    console.log(`Something changed in ${inputName} : ${inputValue}`)
+    rNumShares = Number(inputValue)
+  }
+
   handleSharesChange = (event) => {
 
     let inputName = event.target.name;
     let inputValue = event.target.value;
-    let finalNumShares = this.state.numShares;
   
     console.log(`Something changed in ${inputName} : ${inputValue}`)
-  
-    if(finalNumShares.hasOwnProperty(inputName)){
-        finalNumShares[inputName] = inputValue;
-        this.setState({ numShares : finalNumShares })
-    }
+    rNumShares = Number(inputValue)
   }
   
-  handleBuyShares = (currKey,currentNumShares) => {
-    // TODO: add stock chosen to portfolio
-    //       update stocksHeld
-    console.log("INSIDE HANDLE BUY SHARES")
-    this.state.stocksHeld.push(this.state.dummyStocks[currKey]) 
-    console.log(this.state.stocksHeld)
-    console.log(currentNumShares)
+  handleBuyShares = (currKey) => {
+
+    let curStock = this.state.stocks[currKey]
+    console.log(curStock)
+
+    let index = findTicker(this.state.portfolio, curStock.ticker)
+    if(index !== -1){
+      this.state.portfolio[index][1] = this.state.portfolio[index][1] + rNumShares
+    }
+    else{
+      this.state.portfolio.push([curStock,rNumShares]) 
+    }
+
+    this.setState({
+      portfolio: this.state.portfolio
+    })
+
+    console.log(this.state.portfolio)
+
   }
   
   render() {
+    console.log(this.state.portfolio)
     return (
       //Master Div
       <div>
@@ -294,10 +301,10 @@ class App extends Component {
             handleNextDay={this.handleNextDayChange}
             budget = {this.state.budget}
             profit = {this.state.profit}
-            numShares = {this.state.numShares}
             handleSharesChange = {this.handleSharesChange}
             handleBuyShares = {this.handleBuyShares}
-            stocksHeld = {this.state.stocksHeld}
+            portfolio = {this.state.portfolio}
+            handleSharesSell = {this.handleSharesSell}
         />
       </Container> : null}
 
