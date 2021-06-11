@@ -5,6 +5,17 @@ import './App.css';
 import MainPage from './components/MainPage'
 import APIService from './APIService'
 
+
+const Loader = () => (
+  <Container fluid style={{justifyContent:'center', alignItems:'center'}}>
+  <div class="divLoader" style={{justifyContent:'center', alignItems:'center'}}>
+    <svg class="svgLoader" style={{justifyContent:'center', alignItems:'center'}} viewBox="0 0 100 100" width="100%" height="50em">
+      <path stroke="none" d="M10 50A40 40 0 0 0 90 50A40 42 0 0 1 10 50" fill="#51CACC" transform="rotate(179.719 50 51)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 51;360 50 51" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animateTransform></path>
+    </svg>
+  </div>
+  </Container>
+);
+
 function formatDate(date) {
   var d = new Date(date),
       month = '' + (d.getMonth()),
@@ -55,11 +66,12 @@ class App extends Component {
     var curr = new Date();
     curr.setDate(curr.getDate());
     this.state = {
+      memberId: 0,
       currentDate: formatDate(curr),
       stocks: [{
         ticker: "",
         ipo: null,
-        price: 0
+        price: 0  //represents the average price of the stock 
       }],
       dummyStocks: [ {
         ticker: "TSLA",
@@ -162,7 +174,9 @@ class App extends Component {
       budget: 1000,
       profit: 0,
       portfolio: [],
-      profitLoss: 0
+      profitLoss: 0,
+      curPrice:0,
+      loading: false
     }
 
   }
@@ -173,7 +187,7 @@ class App extends Component {
     let inputValue = event.target.value
     let dateInfo = this.state.currentDate
 
-    console.log('Input date was changed')
+  
 
     dateInfo.hasOwnProperty(inputName) 
       dateInfo = inputValue
@@ -185,41 +199,42 @@ class App extends Component {
 
   gameStart = () =>{
       this.setState({
-        gameStart:true
+        gameStart:true,
+        loading: true
       })
-
+      APIService.createPortfolio(this.state.currentDate).then(response => this.setState({ memberId: response.data.id, budget: response.data.cash }))
+     
+      // APIService.createPortfolio(this.state.currentDate).then(response=>{console.log(response)})
       APIService.initializeStocks(this.state.currentDate)
       .then(res => {
-      console.log(res)
       this.setState ({
-        stocks: res.data
+        stocks: res.data,
+        loading:false
       })
-      console.log(this.state.stocks)
-    })
+
+      })
   }
   
 
   handleNextDayChange = () => {
     var date = new Date(this.state.currentDate);
-    console.log("Before: "+date)
+
     date.setDate(date.getDate()+1);
-     console.log("After: "+date)
-    let newProfit = this.state.profit + 3;
+
     this.setState({
-      currentDate: date,
-      profit: newProfit
+      currentDate: date
     }, function(){
-      console.log("new state check:" + this.state.currentDate)
+  
   }
     );
 
     APIService.getPricesByDate(formatDateForNext(this.state.currentDate))
       .then(res => {
-      console.log(res)
+   
       this.setState ({
         stocks: res.data
       })
-      console.log(this.state.stocks)
+ 
     })
   }
 
@@ -228,7 +243,7 @@ class App extends Component {
     let inputName = event.target.name;
     let inputValue = event.target.value;
   
-    console.log(`Something changed in ${inputName} : ${inputValue}`)
+
     rNumShares = Number(inputValue)
   }
 
@@ -237,17 +252,22 @@ class App extends Component {
     let inputName = event.target.name;
     let inputValue = event.target.value;
   
-    console.log(`Something changed in ${inputName} : ${inputValue}`)
+
     rNumShares = Number(inputValue)
   }
   
   handleBuyShares = (currKey) => {
+ 
 
     let tempPort = this.state.portfolio
     let curStock = this.state.stocks[currKey]
-    console.log(curStock)
+    let curTicker = curStock.ticker
+    let curDate = this.state.currentDate
 
-    let index = findTicker(this.state.portfolio, curStock.ticker)
+    APIService.buyShares(this.state.memberId, curTicker, curDate, rNumShares)
+    // console.log(curStock)
+
+    let index = findTicker(this.state.portfolio, curTicker)
     if(index !== -1){
       tempPort[index][1] = this.state.portfolio[index][1] + rNumShares
     }
@@ -255,33 +275,29 @@ class App extends Component {
       tempPort.push([curStock,rNumShares]) 
     }
 
-    // let tempBudget = this.state.budget - curStock.price * rNumShares
+    let tempBudget = this.state.budget - curStock.price * rNumShares
 
-    // if(tempBudget < 0) {
-    //   tempBudget = "you lose loser boy"
-    // }
+    if(tempBudget < 0) {
+      tempBudget = 0
+    }
 
     this.setState({
-      portfolio: tempPort
-      // budget: tempBudget
+      portfolio: tempPort,
+      budget: tempBudget.toFixed(2)
     })
 
-    console.log(this.state.portfolio)
+ 
 
   }
 
   handleSellShares = (currKey) =>{
-    let tempPort = this.state.portfolio
-    let curStock = this.state.stocks[currKey]
-    console.log(this.state.portfolio)
-    console.log(curStock.ticker)
-    let index = findTicker(this.state.portfolio, curStock.ticker)
-    console.log(index)
-    console.log(this.state.portfolio[index])
-    let temp = this.state.portfolio[index][1] - rNumShares
 
-    //error checking later?
+    let tempPort = this.state.portfolio
+    let curStock = this.state.portfolio[currKey]
+    let index = currKey
+    let temp = this.state.portfolio[index][1] - rNumShares
     if(temp < 0){
+      alert("You don't have enough shares!");
       return
     }
     else if(temp === 0){
@@ -290,23 +306,39 @@ class App extends Component {
     else {
       tempPort[index][1] = this.state.portfolio[index][1] - rNumShares
     }
-    console.log(this.state.portfolio)
-
-    let tempBudget = this.state.budget + curStock.price * rNumShares
-
+   
+    
+    APIService.getTickerPforD(formatDateForNext(this.state.currentDate), curStock[0].ticker)
+  .then(data => {
+    let tempBudget = Number(this.state.budget) + Number(data) * Number(rNumShares)
+    let curProfit = Number(this.state.profit) + ((Number(data) * Number(rNumShares)) - (Number(curStock[0].price) * Number(rNumShares)))
+  
     this.setState({
       portfolio: tempPort,
-      budget: tempBudget
+      budget: tempBudget.toFixed(2),
+      profit: curProfit.toFixed(2)
     })
+  });
+
+    // APIService.getTickerPriceForDate(this.state.currentDate, curStock[0].ticker).then(response=>{this.setState ({
+    //   curPrice: response.data
+    // })})
+    
+    // APIService.getTickerPriceForDate(this.state.currentDate, curStock[0].ticker).then(response=>{console.log(response)})
+    // let tempBudget = Number(this.state.budget) + Number(curStockPrice) * Number(rNumShares)
+
+    // this.setState({
+    //   portfolio: tempPort,
+    //   budget: tempBudget
+    // })
 
   }
   
   render() {
-    console.log(this.state.portfolio)
     return (
       //Master Div
       <div>
-        
+        {this.state.loading ? <Loader /> : null}
         {!this.state.gameStart ? <Container fluid>
         <Row>
           <Col>
@@ -332,7 +364,7 @@ class App extends Component {
         </Row>
       </Container> : null }
 
-      {this.state.gameStart ? <Container fluid>
+      {this.state.gameStart && !this.state.loading ? <Container fluid>
         <MainPage
             dummyStocks={this.state.stocks}
             chosenDate = {this.state.currentDate}
@@ -346,7 +378,6 @@ class App extends Component {
             handleSellShares = {this.handleSellShares}
         />
       </Container> : null}
-
       </div>
 
     );

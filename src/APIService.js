@@ -15,6 +15,30 @@ class APIService{
         return axios.get(GET_API_CLOSINGS + date)
     }
 
+    createPortfolio(date){
+        let portfolios = {date: date, cash: 10000, startDate: date, startCash: 10000}
+        return axios.post(GET_API_PORTFOLIO+"/member", portfolios)
+    }
+
+    buyShares(memberId, ticker, purchaseDate, amount){
+        let holdings = {portfolioId:memberId, ticker: ticker, purchaseDate:purchaseDate, shareQuantity:amount}
+        return axios.post(GET_API_PORTFOLIO+"/member/"+memberId+"/holdings", holdings)
+    }
+
+    getTickerPriceForDate(date, ticker){
+        return axios.get(GET_API_CLOSINGS+ "/price/"+date+"/"+ticker)
+    }
+
+    getTickerPforD (date, ticker) {
+        return axios.get(GET_API_CLOSINGS+ "/price/"+date+"/"+ticker)
+            .then(response => {
+              this.response = response.data
+              return this.response
+            })
+        }
+
+
+
 }
 
 export default new APIService();

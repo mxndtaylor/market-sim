@@ -15,7 +15,7 @@ const StocksHeld = ({inPortfolio, handleSharesSell, handleSellShares, myKey}) =>
                 <Row>
                     <Col>
                         <Card.Text>
-                            ${inPortfolio[0].price} Number of shares: {inPortfolio[1]}
+                            Last Bought At: ${inPortfolio[0].price} <br/># of shares: {inPortfolio[1]}
                         </Card.Text>
                     </Col>
                     <Col>
@@ -83,6 +83,7 @@ class MainPage extends Component {
     constructor(props) {
         super(props)
     }
+    
     render() {
         return (
             <Container fluid>
@@ -115,20 +116,27 @@ class MainPage extends Component {
                             <Col>
                                 <h3 align ="center">Budget:{'\u00A0'}${this.props.budget}</h3>
                             </Col>
-                            <Col>
-                                <h3 align ="center">Profit:{'\u00A0'}${this.props.profit} </h3>
-                            </Col>
+                            {this.props.profit < 0 ?<Col>
+                                <h3 style={{ color: 'red' }} align ="center">Loss:{'\u00A0'}${this.props.profit} </h3>
+                            </Col> : null}
+                            {this.props.profit >= 0 ?<Col>
+                                <h3 style={{ color: 'green' }}align ="center">Profit:{'\u00A0'}${this.props.profit} </h3>
+                            </Col> : null}
                         </Row>
 
                         <div className="cards" id = "box" name = "box">
 
-                            <Row>
+                            {this.props.dummyStocks.length !== 0 ?<Row>
                                     {this.props.dummyStocks.map((dummyStock,i) => {
                                         return <StockCard dummyStock = {dummyStock} myKey = {i} key = {i}
                                                 handleSharesChange = {this.props.handleSharesChange}  
                                                 handleBuyShares = {this.props.handleBuyShares} /> 
                                         })}
-                            </Row>   
+                            </Row> : null}
+
+                            {this.props.dummyStocks.length === 0 ?<Row>
+                                <h1 align ="center">MARKET CLOSED</h1>
+                            </Row> : null}   
 
                         </div>
                     </Col>
