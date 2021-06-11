@@ -262,6 +262,8 @@ class App extends Component {
   
 
     rNumShares = Number(inputValue)
+    console.log('HSHARESSELL')
+    console.log(rNumShares)
   }
 
   handleSharesChange = (event) => {
@@ -271,6 +273,8 @@ class App extends Component {
   
 
     rNumShares = Number(inputValue)
+    console.log("HSHARESCHANGE")
+    console.log(rNumShares)
   }
   
   handleBuyShares = (currKey) => {
@@ -280,8 +284,9 @@ class App extends Component {
     let curStock = this.state.stocks[currKey]
     let curTicker = curStock.ticker
     let curDate = this.state.currentDate
-
-    APIService.buyShares(this.state.memberId, curTicker, curDate, rNumShares)
+    console.log("BEFORE")
+    console.log(tempPort)
+    
     // console.log(curStock)
 
     let index = findTicker(this.state.portfolio, curTicker)
@@ -293,11 +298,19 @@ class App extends Component {
     }
 
     let tempBudget = this.state.budget - curStock.price * rNumShares
-
+    console.log("AFTER")
+    console.log(tempPort)
     if(tempBudget < 0) {
+      tempPort.splice(-1,1)
       alert("You can't afford that many!")
-      return
+      console.log("hbuyshares")
+      console.log(rNumShares)
+      rNumShares = 0
+      console.log(rNumShares)
+    return
     }
+    APIService.buyShares(this.state.memberId, curTicker, curDate, rNumShares)
+   
 
     this.setState({
       portfolio: tempPort,
