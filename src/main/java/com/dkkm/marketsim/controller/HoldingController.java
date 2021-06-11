@@ -14,7 +14,7 @@ public class HoldingController {
     @Autowired
     private HoldingService holdingService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity getHoldingsByPortfolio(@PathVariable int memberId) {
         return ResponseEntity.ok(holdingService.aggregatePortfolioHoldings(memberId));
     }

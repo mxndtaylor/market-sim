@@ -2,6 +2,8 @@ package com.dkkm.marketsim.model.dto;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -17,7 +19,9 @@ public class Holding {
     @Min(0)
     private Integer shareQuantity;
 
-    private Closing closing; // added in service layer
+    // added by service layer
+    private Closing closing;
+    private BigDecimal invested;
 
     public Integer getPortfolioId() {
         return portfolioId;
@@ -59,6 +63,16 @@ public class Holding {
         this.closing = closing;
     }
 
+    public BigDecimal getInvested() {
+        if (invested == null) {
+            return null;
+        }
+        return invested.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public void setInvested(BigDecimal invested) {
+        this.invested = invested.setScale(2, RoundingMode.HALF_UP);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -91,7 +91,7 @@ public class ClosingDBDao implements ClosingDao {
     public List<Closing> getClosingsByDate(LocalDate date) {
         List<Closing> closings;
 
-        final String CLOSINGS_BY_DATE = "SELECT * FROM closings WHERE Date = ? ORDER BY Price DESC;";
+        final String CLOSINGS_BY_DATE = "SELECT * FROM closings WHERE Date = ? ORDER BY Ticker;";
         closings = jdbc.query(CLOSINGS_BY_DATE, new ClosingMapper(), Date.valueOf(date));
 
         return closings;
@@ -105,8 +105,7 @@ public class ClosingDBDao implements ClosingDao {
 
             closing.setDate(resultSet.getDate("Date").toLocalDate());
             closing.setTicker(resultSet.getString("Ticker"));
-            closing.setPrice(new BigDecimal(resultSet.getString("Price"))
-                    .setScale(2, RoundingMode.HALF_UP));
+            closing.setPrice(resultSet.getBigDecimal("Price"));
 
             return closing;
         }

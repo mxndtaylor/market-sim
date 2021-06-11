@@ -41,9 +41,8 @@ public class Portfolio {
         this.date = date;
     }
 
-
     public BigDecimal getStartCash() {
-        return startCash.setScale(2, RoundingMode.HALF_UP);
+        return startCash;
     }
 
     public void setStartCash(BigDecimal startCash) {
@@ -59,7 +58,7 @@ public class Portfolio {
     }
 
     public BigDecimal getCash() {
-        return cash.setScale(2, RoundingMode.HALF_UP);
+        return cash;
     }
 
     public void setCash(BigDecimal cash) {
@@ -88,5 +87,17 @@ public class Portfolio {
     @Override
     public int hashCode() {
         return Objects.hash(date, cash, startDate, startCash);
+    }
+
+    // TODO: remove, only added for test debugging
+    @Override
+    public String toString() {
+        return "Portfolio{" +
+                "id=" + id +
+                ", date=" + date +
+                ", cash=" + cash +
+                ", startDate=" + startDate +
+                ", startCash=" + startCash +
+                '}';
     }
 }

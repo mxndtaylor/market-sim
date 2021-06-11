@@ -1,11 +1,13 @@
 package com.dkkm.marketsim.service;
 
 import com.dkkm.marketsim.model.dao.HoldingDao;
+import com.dkkm.marketsim.model.dto.Closing;
 import com.dkkm.marketsim.model.dto.Holding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -13,14 +15,27 @@ public class HoldingServiceImpl
     extends PassThruCrudServiceImpl<Holding, Holding>
     implements HoldingService {
 
+    private ClosingService closingService;
+
     @Autowired
-    public HoldingServiceImpl(HoldingDao holdingDao) {
+    public HoldingServiceImpl(HoldingDao holdingDao, ClosingService closingService) {
         dao = holdingDao;
+        this.closingService = closingService;
+    }
+
+    @Override
+    public List<Holding> getPortfolioHoldings(int portfolioId) {
+        List<Holding> holdings = ((HoldingDao) dao).getPortfolioHoldings(portfolioId);
+        for (Holding holding : holdings) {
+            setClosing(holding);
+            setInvested(holding);
+        }
+        return holdings;
     }
 
     @Override
     public List<Holding> aggregatePortfolioHoldings(int portfolioId) {
-        List<Holding> holdings = ((HoldingDao) dao).getPortfolioHoldings(portfolioId);
+        List<Holding> holdings = getPortfolioHoldings(portfolioId);
         Map<String, Holding> holdingsByTicker = new HashMap<>();
 
         // adds up all the quantities of a certain stock and removes purchase date field
@@ -32,7 +47,15 @@ public class HoldingServiceImpl
                 // total the quantity of shares of a stock
                 int totalShareQuantity = aggHolding.getShareQuantity() + holding.getShareQuantity();
                 aggHolding.setShareQuantity(totalShareQuantity);
+
+                // total the invested money
+                BigDecimal invested = aggHolding.getInvested();
+                aggHolding.setInvested(invested.add(holding.getInvested()));
+
+                // might not be necessary TODO: check
+                holdingsByTicker.put(ticker, aggHolding);
             } else {
+                holding.setClosing(null);
                 holdingsByTicker.put(ticker, holding);
             }
         }
@@ -44,15 +67,16 @@ public class HoldingServiceImpl
     public Holding aggregatePortfolioHoldingsByTicker(int portfolioId, String ticker) {
         Holding aggHolding = new Holding();
         aggHolding.setTicker(ticker);
-        aggHolding.setShareQuantity(0);
         aggHolding.setPortfolioId(portfolioId);
 
         List<Holding> holdings
                 = ((HoldingDao) dao).getPortfolioHoldingsByTicker(portfolioId, ticker);
+        int totalQuantity = 0;
         for (Holding holding : holdings) {
-            int totalQuantity = aggHolding.getShareQuantity() + holding.getShareQuantity();
-            aggHolding.setShareQuantity(totalQuantity);
+             totalQuantity +=  holding.getShareQuantity();
         }
+
+        aggHolding.setShareQuantity(totalQuantity);
 
         return aggHolding;
     }
@@ -68,22 +92,53 @@ public class HoldingServiceImpl
         // sorted by newest first
         holdings.sort(Comparator.comparing(Holding::getPurchaseDate));
 
-        int sellQuantity = aggregateHolding.getShareQuantity();
+        // get sell orders
+        int sellOrders = aggregateHolding.getShareQuantity();
+        int sellOrdersRemaining = sellOrders;
 
         // reverse iteration to get oldest first
-        for (int i = holdings.size() - 1; sellQuantity > 0 && i > 0; i--) {
+        for (int i = holdings.size() - 1; sellOrdersRemaining > 0 && i >= 0; i--) {
             Holding holding = holdings.get(i);
             int holdingQuantity = holding.getShareQuantity();
-            if (sellQuantity > holdingQuantity && dao.deleteMemberByKey(holding)) {
-                sellQuantity = sellQuantity - holdingQuantity;
-            } else {
-                holding.setShareQuantity(holdingQuantity - sellQuantity);
-                if (dao.updateMember(holding)) {
-                    sellQuantity = 0;
+
+            // set holding quantity to 0 when we sell all of it
+            //                   or to the remaining quantity when we run out of sell orders
+            holding.setShareQuantity(Math.max(0, holdingQuantity - sellOrdersRemaining));
+
+            // do nothing if update does not succeed
+            if (dao.updateMember(holding)) {
+                // 0 when above has remaining quantity
+                // remaining orders when above is 0
+                sellOrdersRemaining = Math.max(0, sellOrdersRemaining - holdingQuantity);
+
+                // attempt delete of holdings with 0 remaining shares
+                if (holding.getShareQuantity() == 0) {
+                    dao.deleteMemberByKey(holding);
                 }
             }
         }
 
-        return aggregateHolding.getShareQuantity() - sellQuantity;
+        // calculate the number of successful sell orders
+        return sellOrders - sellOrdersRemaining;
+    }
+
+    private void setClosing(Holding holding) {
+        Closing key = new Closing();
+        key.setTicker(holding.getTicker());
+        key.setDate(holding.getPurchaseDate());
+        key = closingService.getMemberByKey(key);
+
+        holding.setClosing(key);
+    }
+
+    private void setInvested(Holding holding) {
+        BigDecimal price;
+        if (holding.getClosing() != null) {
+            price = holding.getClosing().getPrice();
+        } else {
+            price = closingService.getSharePrice(holding.getTicker(), holding.getPurchaseDate());
+        }
+        BigDecimal invested = BigDecimal.valueOf(holding.getShareQuantity()).multiply(price);
+        holding.setInvested(invested);
     }
 }
