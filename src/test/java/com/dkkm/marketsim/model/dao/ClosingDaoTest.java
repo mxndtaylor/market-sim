@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TestApplicationConfiguration.class)
-class ClosingDBDaoTest {
+class ClosingDaoTest {
 
     @Autowired
     private PortfolioDao portfolioDao;

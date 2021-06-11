@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TestApplicationConfiguration.class)
-class PortfolioDBDaoTest {
+class HoldingDaoTest {
 
     @Autowired
     private PortfolioDao portfolioDao;
@@ -58,6 +58,14 @@ class PortfolioDBDaoTest {
 
     @Test
     public void addMember() {
+    }
+
+    @Test
+    public void getPortfolioHoldings() {
+    }
+
+    @Test
+    public void getPortfolioHoldingsByTicker() {
     }
 
     @Test
