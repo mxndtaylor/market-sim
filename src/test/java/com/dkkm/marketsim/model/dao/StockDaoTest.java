@@ -106,6 +106,7 @@ class StockDaoTest {
 
     @Test
     public void deleteMemberByKey() {
+        //given
         final int LIST_LENGTH = 50 - mocker.nextInt(50);
         List<Stock> stocks = mocker.stocks().limit(LIST_LENGTH).collect(Collectors.toList());
         Set<String> tickers = new HashSet<>();
