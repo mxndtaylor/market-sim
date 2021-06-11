@@ -1,5 +1,9 @@
-#box {
+.MainPage{
+    font-family: 'Roboto Mono', monospace;
+}
 
+#box {
+ 
     margin-right: auto;
     margin-left: 50px;
     background-color: white;
@@ -17,8 +21,16 @@ h2 {
     margin-top: 280px;
 }
 
+.sell-button {
+    margin-bottom: 5px;
+}
+
+.buy-button {
+    margin-top: 5px;
+}
+
 #collection {
-    margin-top: 60px;
+    margin-top: 105px;
     /* width: 200px; */
     margin-right: auto;
     margin-left: 50px;

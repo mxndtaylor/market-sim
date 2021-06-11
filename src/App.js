@@ -217,10 +217,25 @@ class App extends Component {
   
 
   handleNextDayChange = () => {
-    var date = new Date(this.state.currentDate);
+    console.log(this.state.currentDate)
+    
+    
+    // console.log(typeof(this.state.currentDate))
+    // console.log(date)
+    var date
+    if(typeof(this.state.currentDate) === 'string'){
 
-    date.setDate(date.getDate()+1);
-
+      date = new Date(this.state.currentDate + "T00:00:00")
+      console.log(typeof(this.state.currentDate))
+      console.log(date)
+    }
+    else{
+      console.log(typeof(this.state.currentDate))
+      console.log(date)
+      date = new Date(this.state.currentDate)
+      date.setDate(date.getDate()+1);
+    }
+  
     this.setState({
       currentDate: date
     }, function(){
@@ -228,7 +243,9 @@ class App extends Component {
   }
     );
 
-    APIService.getPricesByDate(formatDateForNext(this.state.currentDate))
+    console.log("DATE GOING TO AXIOS -> ")
+    console.log(date)
+    APIService.getPricesByDate(formatDateForNext(date))
       .then(res => {
    
       this.setState ({
@@ -278,7 +295,8 @@ class App extends Component {
     let tempBudget = this.state.budget - curStock.price * rNumShares
 
     if(tempBudget < 0) {
-      tempBudget = 0
+      alert("You can't afford that many!")
+      return
     }
 
     this.setState({

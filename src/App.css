@@ -1,5 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100&family=Roboto+Mono&display=swap');
+
 .App {
   text-align: center;
+  font-family: 'Roboto Mono', monospace;
+}
+
+body{
+  text-align: center;
+  font-family: 'Roboto Mono', monospace;
 }
 
 .App-logo {
