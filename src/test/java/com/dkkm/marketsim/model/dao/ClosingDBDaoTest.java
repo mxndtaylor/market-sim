@@ -1,9 +1,7 @@
 package com.dkkm.marketsim.model.dao;
 
 import com.dkkm.marketsim.TestApplicationConfiguration;
-import com.dkkm.marketsim.model.dto.Closing;
-import com.dkkm.marketsim.model.dto.Mocker;
-import com.dkkm.marketsim.model.dto.Stock;
+import com.dkkm.marketsim.model.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +22,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class ClosingDBDaoTest {
 
     @Autowired
+    private PortfolioDao portfolioDao;
+
+    @Autowired
+    private HoldingDao holdingDao;
+
+    @Autowired
     private ClosingDao closingDao;
 
     @Autowired
@@ -41,6 +45,16 @@ class ClosingDBDaoTest {
         List<Closing> closings = closingDao.getMembers();
         for (Closing closing : closings) {
             closingDao.deleteMemberByKey(closing);
+        }
+
+        List<Holding> holdings = holdingDao.getMembers();
+        for (Holding holding : holdings) {
+            holdingDao.deleteMemberByKey(holding);
+        }
+
+        List<Portfolio> portfolios = portfolioDao.getMembers();
+        for (Portfolio portfolio : portfolios) {
+            portfolioDao.deleteMemberByKey(portfolio.getId());
         }
 
         mocker = new Mocker();
