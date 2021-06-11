@@ -140,14 +140,13 @@ class StockDaoTest {
         Stock stockToBeUpdated = mocker.nextStock();
         stockToBeUpdated = stockDao.addMember(stockToBeUpdated);
 
-        List<Stock> preUpdateStocks = stockDao.getMembers();
-
         LocalDate newIpo = mocker.nextDate();
         Stock stockWithUpdates = new Stock();
         stockWithUpdates.setTicker(stockToBeUpdated.getTicker());
         stockWithUpdates.setIpo(newIpo);
 
         //when
+        List<Stock> preUpdateStocks = stockDao.getMembers();
         boolean updateSucceeded = stockDao.updateMember(stockWithUpdates);
         Stock fetchWithOldKey = stockDao.getMemberByKey(stockToBeUpdated.getTicker());
         Stock fetchWithNewKey = stockDao.getMemberByKey(stockWithUpdates.getTicker());
