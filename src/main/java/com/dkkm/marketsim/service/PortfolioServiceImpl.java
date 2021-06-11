@@ -116,9 +116,9 @@ public class PortfolioServiceImpl
 
     @Override
     @Transactional
-    public Holding buyTickerQuantityForPortfolio(int portfolioId, String ticker, int buyQuantity) {
+    public Holding buyTickerQuantityForPortfolio(int portfolioId, String ticker, LocalDate date, int buyQuantity) {
         Portfolio portfolio = dao.getMemberByKey(portfolioId);
-        Holding receipt = makePurchasePreview(portfolio, ticker, buyQuantity);
+        Holding receipt = makePurchasePreview(portfolio, ticker, date, buyQuantity);
 
         if (receipt.getShareQuantity() == 0) {
             return receipt;
@@ -148,14 +148,14 @@ public class PortfolioServiceImpl
         return receipt;
     }
 
-    private Holding makePurchasePreview(Portfolio portfolio, String ticker, int purchasesDesired) {
-        BigDecimal price = closingService.getSharePrice(ticker, portfolio.getDate());
+    private Holding makePurchasePreview(Portfolio portfolio, String ticker,LocalDate date, int purchasesDesired) {
+        BigDecimal price = closingService.getSharePrice(ticker, date);
         BigDecimal budget = portfolio.getCash();
 
         // start receipt
         Holding purchasePreview = new Holding();
         purchasePreview.setPortfolioId(portfolio.getId());
-        purchasePreview.setPurchaseDate(portfolio.getDate());
+        purchasePreview.setPurchaseDate(date);
         purchasePreview.setTicker(ticker);
 
         // make sure number of actual purchases does not result in negative funds

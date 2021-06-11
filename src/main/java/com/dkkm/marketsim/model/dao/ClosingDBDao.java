@@ -110,5 +110,4 @@ public class ClosingDBDao implements ClosingDao {
             return closing;
         }
     }
-
 }
