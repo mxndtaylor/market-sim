@@ -15,9 +15,10 @@ import java.util.List;
 @RequestMapping("/api/portfolios")
 public class PortfolioController {
 
+    @Autowired
     private PortfolioService portfolioService;
 
-    @GetMapping("/")
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public List<Portfolio> fetchPortfolioList() {
         return portfolioService.getMembers();
@@ -43,8 +44,8 @@ public class PortfolioController {
             @RequestBody Holding holding) {
         String ticker = holding.getTicker();
         int buyQuantity = holding.getShareQuantity();
-        int boughtQuantity = portfolioService.buyTickerQuantityForPortfolio(memberId, ticker, buyQuantity);
-        return new ResponseEntity<>(boughtQuantity, HttpStatus.OK);
+        Holding bought = portfolioService.buyTickerQuantityForPortfolio(memberId, ticker, buyQuantity);
+        return new ResponseEntity<>(bought.getShareQuantity(), HttpStatus.OK);
     }
 
     @PostMapping("/member/{memberId}/{ticker}")
@@ -52,10 +53,10 @@ public class PortfolioController {
             @PathVariable int memberId, @PathVariable String ticker,
             @RequestBody Integer quantity) {
         // TODO: add validator check
-        int quantitySold = portfolioService.sellTickerQuantityFromPortfolio(
+        Holding sold = portfolioService.sellTickerQuantityFromPortfolio(
                 memberId, ticker, quantity);
 
-        return ResponseEntity.ok(quantitySold);
+        return new ResponseEntity<>(sold.getShareQuantity(), HttpStatus.OK);
     }
 
     @PutMapping("/member")

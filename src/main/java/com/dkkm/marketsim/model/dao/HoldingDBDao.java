@@ -43,10 +43,15 @@ public class HoldingDBDao implements HoldingDao {
         final String GET_MEMBER = "SELECT * FROM Holdings WHERE PortfolioId = ? AND " +
                 "PurchaseDate = ? AND Ticker = ?;";
         Holding holding;
-        holding = jdbc.queryForObject(GET_MEMBER, new HoldingMapper(),
+        List<Holding> holdings = jdbc.query(GET_MEMBER, new HoldingMapper(),
                 key.getPortfolioId(),
                 key.getPurchaseDate(),
                 key.getTicker());
+        if (holdings.size() == 0) {
+            holding = null;
+        } else {
+            holding = holdings.get(0);
+        }
 
         return holding;
     }

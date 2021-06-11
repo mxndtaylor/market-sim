@@ -43,6 +43,9 @@ public class Portfolio {
 
 
     public BigDecimal getStartCash() {
+        if (startCash == null) {
+            return null;
+        }
         return startCash.setScale(2, RoundingMode.HALF_UP);
     }
 
@@ -59,6 +62,9 @@ public class Portfolio {
     }
 
     public BigDecimal getCash() {
+        if (cash == null) {
+            return null;
+        }
         return cash.setScale(2, RoundingMode.HALF_UP);
     }
 

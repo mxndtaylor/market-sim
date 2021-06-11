@@ -15,7 +15,7 @@ CREATE TABLE Stocks (
 CREATE TABLE Closings (
 	`Date` DATE NOT NULL,
     Ticker VARCHAR(5) NOT NULL,
-    Price FLOAT(15, 2) NOT NULL,
+    Price DOUBLE NOT NULL,
     PRIMARY KEY (`Date`, Ticker),
 		FOREIGN KEY fk_Closings_Stocks (Ticker) REFERENCES Stocks(Ticker)
 );
@@ -23,10 +23,10 @@ CREATE TABLE Closings (
 CREATE TABLE Portfolios (
 	PortfolioId INT PRIMARY KEY AUTO_INCREMENT,
     `Date` DATE NOT NULL,
-    Cash FLOAT(20, 2) NOT NULL,
+    Cash DOUBLE NOT NULL,
     # perhaps unnecessary, but it's the only thing the UI passes to the backend so we might as well save it.
     StartDate DATE NOT NULL,
-    StartCash FLOAT(20, 2) NOT NULL
+    StartCash DOUBLE NOT NULL
 );
 
 CREATE TABLE Holdings (

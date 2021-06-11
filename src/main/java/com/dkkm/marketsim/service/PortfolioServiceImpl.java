@@ -5,10 +5,12 @@ import com.dkkm.marketsim.model.dto.Holding;
 import com.dkkm.marketsim.model.dto.Portfolio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -46,7 +48,9 @@ public class PortfolioServiceImpl
             portfolio.setStartCash(currentCash);
         }
 
-        return super.addMember(portfolio);
+        portfolio = super.addMember(portfolio);
+        portfolio.setHoldings(new ArrayList<>());
+        return portfolio;
     }
 
     @Override
@@ -78,45 +82,95 @@ public class PortfolioServiceImpl
     }
 
     @Override
-    public int sellTickerQuantityFromPortfolio(int portfolioId, String ticker, int sellQuantity) {
+    @Transactional
+    public Holding sellTickerQuantityFromPortfolio(int portfolioId, String ticker, int sellQuantity) {
         Portfolio portfolio = dao.getMemberByKey(portfolioId);
 
-        Holding holding = holdingService.aggregatePortfolioHoldingsByTicker(portfolioId, ticker);
-        int initialQuantity = holding.getShareQuantity();
-        int remainingQuantity = Math.max(0, initialQuantity - sellQuantity);
+        Holding receipt = holdingService.aggregatePortfolioHoldingsByTicker(portfolioId, ticker);
 
-        holding.setShareQuantity(remainingQuantity);
-        BigDecimal soldQuantity = BigDecimal.valueOf(holdingService.sellHoldingsByAggHolding(holding));
+        // guarantee that 0 < sellQuantity < availableQuantity
+        int availableQuantity = receipt.getShareQuantity();
+        sellQuantity = Math.max(sellQuantity, 0);
+        sellQuantity = Math.min(availableQuantity, sellQuantity);
 
+        // save attempt to receipt
+        receipt.setShareQuantity(sellQuantity);
+
+        // attempt sale, save actual sale in receipt
+        receipt.setShareQuantity(holdingService.sellHoldingsByAggHolding(receipt));
+
+        // calculate profit
+        BigDecimal soldQuantity = BigDecimal.valueOf(receipt.getShareQuantity());
         BigDecimal shareValue = closingService.getSharePrice(ticker, portfolio.getDate());
-        portfolio.setCash(portfolio.getCash()
-                                    .add(shareValue
-                                            .multiply(soldQuantity)));
+        BigDecimal profit = shareValue.multiply(soldQuantity);
+
+        // save negated profit to receipt to represent money flowing into portfolio
+        receipt.setInvested(profit.negate());
+
+        // update portfolio with profit
+        portfolio.setCash(portfolio.getCash().add(profit));
         dao.updateMember(portfolio);
-        return soldQuantity.intValue();
+
+        return receipt;
     }
 
     @Override
-    public int buyTickerQuantityForPortfolio(int portfolioId, String ticker, int buyQuantity) {
+    @Transactional
+    public Holding buyTickerQuantityForPortfolio(int portfolioId, String ticker, int buyQuantity) {
         Portfolio portfolio = dao.getMemberByKey(portfolioId);
+        Holding receipt = makePurchasePreview(portfolio, ticker, buyQuantity);
 
-        BigDecimal pricePerShare = closingService.getSharePrice(ticker, portfolio.getDate());
-        int affordQuantity = portfolio.getCash().divide(pricePerShare, RoundingMode.DOWN).intValueExact();
-        int boughtQuantity = Math.min(buyQuantity, affordQuantity);
-
-        Holding holding = new Holding();
-        holding.setShareQuantity(boughtQuantity);
-
-        if (holding.getShareQuantity() > 0) {
-            Holding newHolding = new Holding();
-            newHolding.setPortfolioId(portfolioId);
-            newHolding.setTicker(ticker);
-            newHolding.setPurchaseDate(portfolio.getDate());
-
-            holding = holdingService.addMember(newHolding);
+        if (receipt.getShareQuantity() == 0) {
+            return receipt;
         }
 
-        return holding.getShareQuantity();
+        // To avoid duplicate insertion
+        Holding dup = holdingService.getMemberByKey(receipt);
+        if (dup != null) { // update member when there is a duplicate
+            int prevPurchased = dup.getShareQuantity();
+            dup.setShareQuantity(prevPurchased + receipt.getShareQuantity());
+
+            if (!holdingService.updateMember(dup)) {
+                receipt.setShareQuantity(0);
+            }
+        } else { // add member when there's no duplicate
+            receipt = holdingService.addMember(receipt);
+            receipt.setShareQuantity(receipt.getShareQuantity());
+        }
+
+        // conditional b/c holdingService may mutate receipt's share quantity
+        if (receipt.getShareQuantity() > 0) {
+            BigDecimal remainderAfterPurchase = portfolio.getCash().subtract(receipt.getInvested());
+            portfolio.setCash(remainderAfterPurchase);
+            dao.updateMember(portfolio);
+        }
+
+        return receipt;
+    }
+
+    private Holding makePurchasePreview(Portfolio portfolio, String ticker, int purchasesDesired) {
+        BigDecimal price = closingService.getSharePrice(ticker, portfolio.getDate());
+        BigDecimal budget = portfolio.getCash();
+
+        // start receipt
+        Holding purchasePreview = new Holding();
+        purchasePreview.setPortfolioId(portfolio.getId());
+        purchasePreview.setPurchaseDate(portfolio.getDate());
+        purchasePreview.setTicker(ticker);
+
+        // make sure number of actual purchases does not result in negative funds
+        // find most purchases allowed regardless of desired purchase quantity
+        int purchasesAllowed = budget.divide(price, RoundingMode.DOWN).intValue();
+        // find most purchases that are allowed and desired
+        int purchasesAllowedAndDesired = Math.min(purchasesDesired, purchasesAllowed);
+
+        // save to receipt
+        purchasePreview.setShareQuantity(purchasesAllowedAndDesired);
+
+        // save actual purchases total price to receipt
+        purchasePreview.setInvested(price.multiply(BigDecimal.valueOf(purchasesAllowedAndDesired)));
+
+        return purchasePreview;
     }
 
     private void setHoldings(Portfolio portfolio) {
