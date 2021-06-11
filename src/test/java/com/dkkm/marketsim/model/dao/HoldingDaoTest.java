@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,11 +58,53 @@ class HoldingDaoTest {
     }
 
     @Test
-    public void addMember() {
+    public void addGetMember() {
+        //given
+        Portfolio portfolio = mocker.nextPortfolio();
+        portfolioDao.addMember(portfolio);
+        Holding holding = portfolio.getHoldings().get(0);
+        Closing closing = holding.getClosing();
+        Stock stock = closing.getStock();
+        stockDao.addMember(stock);
+        closingDao.addMember(closing);
+
+        //when
+        Holding createdHolding = holdingDao.addMember(holding);
+        Holding fetchedByOldKey = holdingDao.getMemberByKey(holding);
+        Holding fetchedByNewKey = holdingDao.getMemberByKey(createdHolding);
+
+        //then
+        assertEquals(holding, createdHolding);
+        assertEquals(holding, fetchedByOldKey);
+        assertEquals(holding, fetchedByNewKey);
     }
 
     @Test
     public void getPortfolioHoldings() {
+        //given
+        Portfolio portfolioToSearchBy = mocker.nextPortfolio();
+        portfolioToSearchBy = portfolioDao.addMember(portfolioToSearchBy);
+        int portfolioToSearchById = portfolioToSearchBy.getId();
+        final int LIST_LENGTH = 30 - mocker.nextInt(30);
+        List<Holding> holdings = mocker.holdings(portfolioToSearchById)
+                                       .limit(LIST_LENGTH)
+                                       .collect(Collectors.toList());
+        holdings.forEach(holding -> {
+            // TODO: avoid duplicate inserts
+            Closing closing = holding.getClosing();
+            Stock stock = closing.getStock();
+            stockDao.addMember(stock);
+            closingDao.addMember(closing);
+            holdingDao.addMember(holding);
+        });
+
+
+        //when
+        //List<Holding> fetched = holdingDao.getPortfolioHoldings(portfolioToSearchById);
+
+        //then
+        //assertEquals(LIST_LENGTH, fetched.size());
+
     }
 
     @Test

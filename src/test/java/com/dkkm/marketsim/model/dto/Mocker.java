@@ -7,27 +7,19 @@ import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+/** generates randomized dtos
+ * if you generate a portfolio for example, it generates holdings
+ * which generate closings, which generate stocks
+ * all are accessible through progressive get calls from the portfolio
+ */
 public class Mocker extends Random {
 
     public Mocker(long seed) {
         super(seed);
-
-        // init data type generators
-        tickers();
-        dates();
-        moneyAmounts();
-        positiveInts();
-        moneyAmounts();
-
-        // init DTO generators
-        stocks();
-        closings();
-        holdings();
-        portfolios();
     }
 
     public Mocker() {
-        this(new Random().nextLong());
+        super();
     }
 
     private void reseed() {
@@ -64,14 +56,14 @@ public class Mocker extends Random {
         return closing;
     }
 
-    public Stream<Holding> holdings() {
-        return Stream.generate(this::nextHolding);
+    public Stream<Holding> holdings(int portfolioId) {
+        return Stream.generate(() -> (nextHolding(portfolioId)));
     }
 
-    public Holding nextHolding() {
+    public Holding nextHolding(int portfolioId) {
         reseed();
         Holding holding = new Holding();
-        holding.setPortfolioId(nextPortfolio().getId());
+        holding.setPortfolioId(portfolioId);
         holding.setShareQuantity(nextPositiveInt());
 
         // make valid connections
@@ -100,7 +92,7 @@ public class Mocker extends Random {
         // make valid holdings to insert into table
         List<Holding> holdings = new ArrayList<>();
         for (int i = 0; i < super.nextInt(12); i++) {
-            Holding holding = nextHolding();
+            Holding holding = nextHolding(portfolio.getId());
             holding.setPortfolioId(portfolio.getId());
             holdings.add(holding);
         }
@@ -140,8 +132,12 @@ public class Mocker extends Random {
     public BigDecimal nextMoneyAmount() {
         reseed();
         return BigDecimal.valueOf(
-                super.doubles(0, Double.MAX_VALUE).iterator().next()
-        ).setScale(2, RoundingMode.HALF_UP);
+                // $100 billion seems like a big enough amount that no one would
+                // sit around for long enough to earn, so it makes a good testing maximum
+                // plus numbers over that seem to have rounding errors when converting to
+                // doubles for the sql table
+                super.doubles(0, 1000000000)
+                        .iterator().next()).setScale(2, RoundingMode.HALF_UP);
     }
 
     public Stream<String> tickers() {
@@ -163,8 +159,7 @@ public class Mocker extends Random {
     }
 
     public Stream<LocalDate> dates() {
-        Stream<LocalDate> dateStream = Stream.generate(this::nextDate);
-        return dateStream;
+        return Stream.generate(this::nextDate);
     }
 
     public LocalDate nextDate() {

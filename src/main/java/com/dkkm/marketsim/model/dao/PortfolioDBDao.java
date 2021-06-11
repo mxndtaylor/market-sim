@@ -26,9 +26,9 @@ public class PortfolioDBDao implements PortfolioDao {
                 "VALUES (?,TRUNCATE(?,2),?,TRUNCATE(?,2));";
         int rowsAffected = jdbc.update(ADD_MEMBER,
                 portfolio.getDate(),
-                portfolio.getCash().doubleValue(),
+                portfolio.getCash(),
                 portfolio.getStartDate(),
-                portfolio.getStartCash().doubleValue());
+                portfolio.getStartCash());
 
         if (rowsAffected == 1) {
             final String GET_LAST_ID = "SELECT LAST_INSERT_ID();";
@@ -79,7 +79,7 @@ public class PortfolioDBDao implements PortfolioDao {
                 portfolio.getDate(),
                 portfolio.getCash().doubleValue(),
                 portfolio.getStartDate(),
-                portfolio.getStartCash().doubleValue(),
+                portfolio.getStartCash(),
                 portfolio.getId());
 
         return rowsAffected == 1;
@@ -92,10 +92,8 @@ public class PortfolioDBDao implements PortfolioDao {
             Portfolio portfolio = new Portfolio();
 
             portfolio.setId(resultSet.getInt("PortfolioId"));
-            portfolio.setCash(BigDecimal.valueOf(resultSet.getFloat("Cash"))
-                    .setScale(2, RoundingMode.HALF_UP));
-            portfolio.setStartCash(BigDecimal.valueOf(resultSet.getFloat("StartCash"))
-                    .setScale(2, RoundingMode.HALF_UP));
+            portfolio.setCash(resultSet.getBigDecimal("Cash"));
+            portfolio.setStartCash(resultSet.getBigDecimal("StartCash"));
             portfolio.setDate(resultSet.getDate("Date").toLocalDate());
             portfolio.setStartDate(resultSet.getDate("StartDate").toLocalDate());
 

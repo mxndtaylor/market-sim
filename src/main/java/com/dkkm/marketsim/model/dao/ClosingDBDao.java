@@ -105,8 +105,7 @@ public class ClosingDBDao implements ClosingDao {
 
             closing.setDate(resultSet.getDate("Date").toLocalDate());
             closing.setTicker(resultSet.getString("Ticker"));
-            closing.setPrice(new BigDecimal(resultSet.getString("Price"))
-                    .setScale(2, RoundingMode.HALF_UP));
+            closing.setPrice(resultSet.getBigDecimal("Price"));
 
             return closing;
         }

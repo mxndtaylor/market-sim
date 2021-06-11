@@ -33,11 +33,6 @@ class StockDaoTest {
     @Autowired
     private StockDao stockDao;
 
-    /** generates randomized dtos
-     * if you generate a portfolio for example, it generates holdings
-     * which generate closings, which generate stocks
-     * all are accessible through progressive get calls from the portfolio
-     */
     private Mocker mocker;
 
     @BeforeEach
