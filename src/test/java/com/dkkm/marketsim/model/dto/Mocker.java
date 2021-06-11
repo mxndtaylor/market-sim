@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -16,9 +15,9 @@ public class Mocker extends Random {
         // init data type generators
         tickers();
         dates();
-        prices();
-        ids();
-        cashes();
+        moneyAmounts();
+        positiveInts();
+        moneyAmounts();
 
         // init DTO generators
         stocks();
@@ -36,8 +35,7 @@ public class Mocker extends Random {
     }
 
     public Stream<Stock> stocks() {
-        Stream<Stock> stockStream = Stream.generate(this::nextStock);
-        return stockStream;
+        return Stream.generate(this::nextStock);
     }
 
     public Stock nextStock() {
@@ -49,15 +47,14 @@ public class Mocker extends Random {
     }
 
     public Stream<Closing> closings() {
-        Stream<Closing> closingStream = Stream.generate(this::nextClosing);
-        return closingStream;
+        return Stream.generate(this::nextClosing);
     }
 
     public Closing nextClosing() {
         reseed();
         Closing closing = new Closing();
         closing.setDate(nextDate());
-        closing.setPrice(nextPrice());
+        closing.setPrice(nextMoneyAmount());
 
         // make valid connection
         Stock stock = nextStock();
@@ -68,15 +65,14 @@ public class Mocker extends Random {
     }
 
     public Stream<Holding> holdings() {
-        Stream<Holding> holdingStream = Stream.generate(this::nextHolding);
-        return holdingStream;
+        return Stream.generate(this::nextHolding);
     }
 
     public Holding nextHolding() {
         reseed();
         Holding holding = new Holding();
         holding.setPortfolioId(nextPortfolio().getId());
-        holding.setShareQuantity(nextId());
+        holding.setShareQuantity(nextPositiveInt());
 
         // make valid connections
         Closing closing = nextClosing();
@@ -84,20 +80,24 @@ public class Mocker extends Random {
         holding.setPurchaseDate(closing.getDate());
         holding.setClosing(closing);
 
+        // calculate invested
+        BigDecimal price = holding.getClosing().getPrice();
+        BigDecimal invested = BigDecimal.valueOf(holding.getShareQuantity()).multiply(price);
+        holding.setInvested(invested);
+
         return holding;
     }
 
     public Stream<Portfolio> portfolios() {
-        Stream<Portfolio> portfolioStream = Stream.generate(this::nextPortfolio);
-        return portfolioStream;
+        return Stream.generate(this::nextPortfolio);
     }
 
     public Portfolio nextPortfolio() {
         reseed();
         Portfolio portfolio = new Portfolio();
-        portfolio.setId(nextId());
+        portfolio.setId(nextPositiveInt());
 
-        // make real valid holdings to insert into table
+        // make valid holdings to insert into table
         List<Holding> holdings = new ArrayList<>();
         for (int i = 0; i < super.nextInt(12); i++) {
             Holding holding = nextHolding();
@@ -106,8 +106,8 @@ public class Mocker extends Random {
         }
         portfolio.setHoldings(holdings);
 
-        portfolio.setCash(nextCash());
-        portfolio.setStartCash(nextCash());
+        portfolio.setCash(nextMoneyAmount());
+        portfolio.setStartCash(nextMoneyAmount());
 
         // verify start date comes first
         LocalDate startDate = nextDate();
@@ -123,33 +123,21 @@ public class Mocker extends Random {
         return portfolio;
     }
 
-    public IntStream ids() {
-        IntStream idStream = super.ints(0, Integer.MAX_VALUE);
-        return idStream;
+    public IntStream positiveInts() {
+        return super.ints(0, Integer.MAX_VALUE);
     }
 
-    public Integer nextId() {
+    public Integer nextPositiveInt() {
         reseed();
         return super.ints(0, Integer.MAX_VALUE).iterator().nextInt();
     }
 
-    public Stream<BigDecimal> prices() {
-        return Stream.generate(this::nextPrice);
-    }
-
-    public BigDecimal nextPrice() {
+    public Stream<BigDecimal> moneyAmounts() {
         reseed();
-        return BigDecimal.valueOf(
-                super.doubles(0, 400000).iterator().next()
-        ).setScale(2, RoundingMode.HALF_UP);
+        return Stream.generate(this::nextMoneyAmount);
     }
 
-    public Stream<BigDecimal> cashes() {
-        reseed();
-        return Stream.generate(this::nextCash);
-    }
-
-    public BigDecimal nextCash() {
+    public BigDecimal nextMoneyAmount() {
         reseed();
         return BigDecimal.valueOf(
                 super.doubles(0, Double.MAX_VALUE).iterator().next()
