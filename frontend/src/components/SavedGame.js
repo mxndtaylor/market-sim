@@ -15,10 +15,7 @@ class SavedGame extends Component {
 	}
 
 	handleDeleteClick() {
-		if (confirm("About to delete Game #" 
-				+ this.state.id + ". \nContinue?")){
-			this.props.deleteGame(this.state.id);
-		}
+		this.props.deleteGame(this.state.id);
 	}
 
 	handleLoadClick() {
@@ -30,18 +27,18 @@ class SavedGame extends Component {
 			<Card>
 				<Card.Header>Game #{this.state.id}</Card.Header>
 				<Card.Body>
-					<Row className="g-2">
+					<Row className="g-2 justify-content-center">
 						<Col md="5">{this.state.startDate}</Col>
 						<Col md="5">{this.state.date}</Col>
 						<Col md="5">{this.state.startCash}</Col>
 						<Col md="5">{this.state.cash}</Col>
 					</Row>
-					<Row>
-						<Button variant="primary" value="load" size="sm"
-							onClick={this.handleLoadClick} />
-						<Button variant="danger" value="delete" size="sm"
-							onClick={this.handleDeleteClick} />
-					</Row>
+				</Card.Body>
+				<Card.Body>
+					<Button variant="primary" value="load" size="sm"
+						onClick={this.handleLoadClick} />
+					<Button variant="danger" value="delete" size="sm"
+						onClick={this.handleDeleteClick} />
 				</Card.Body>
 			</Card>
 		);

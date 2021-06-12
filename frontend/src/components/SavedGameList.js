@@ -1,14 +1,8 @@
 import React, { Component } from 'react';
+import APIService from '../APIService';
 import SavedGame from './SavedGame';
 
 class SavedGameList extends Component {
-	constructor(props) {
-		super(props);
-		this.setState({
-			saveGames : props.saveGames,
-		});
-	}
-
 	handleLoadGame(id) {
 		this.props.loadGame(id);
 	}

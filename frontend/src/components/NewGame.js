@@ -22,17 +22,17 @@ class NewGame extends Component {
 	render() {
 		return (
 			<>
-				<h2>New Game</h2>
-				<Form>
-					<Form.Group controlId="inputDate">
-						<Form.Label>Select date to start from</Form.Label>
-						<Form.Control type="date" value={this.state.date} 
-							onChange={this.handleDateChange}/>
-					</Form.Group>
-					<Button onClick={this.props.gameStart}>
-						START
-					</Button>
-				</Form>
+			<h2>New Game</h2>
+			<Form>
+				<Form.Group controlId="inputDate">
+					<Form.Label>Select date to start from</Form.Label>
+					<Form.Control type="date" value={this.state.date} 
+						onChange={this.handleDateChange}/>
+				</Form.Group>
+				<Button onClick={this.props.gameStart}>
+					START
+				</Button>
+			</Form>
 			</>
 		);
 	}
