@@ -1,20 +1,19 @@
 import React, {Component} from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+} from 'react-router-dom';
 import {Container, Row, Col} from "react-bootstrap";
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import MainPage from './components/MainPage'
+
 import APIService from './APIService'
 
+import GameView from './views/GameView'
+import StartView from './views/StartView'
+import LoaderView from './views/LoaderView';
 
-const Loader = () => (
-  <Container fluid style={{justifyContent:'center', alignItems:'center'}}>
-  <div class="divLoader" style={{justifyContent:'center', alignItems:'center'}}>
-    <svg class="svgLoader" style={{justifyContent:'center', alignItems:'center'}} viewBox="0 0 100 100" width="100%" height="50em">
-      <path stroke="none" d="M10 50A40 40 0 0 0 90 50A40 42 0 0 1 10 50" fill="#51CACC" transform="rotate(179.719 50 51)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 51;360 50 51" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animateTransform></path>
-    </svg>
-  </div>
-  </Container>
-);
 
 function formatDate(date) {
   var d = new Date(date),
@@ -366,50 +365,43 @@ class App extends Component {
   }
   
   render() {
+    // TODO:
+    // if this.state.loading route to /loading?
+    // if this.state.gameStart route to /game?
+
+    // better yet figure out where these are set and route to the correct page
+    // instead of using psuedo-global flags
     return (
       //Master Div
-      <div>
-        {this.state.loading ? <Loader /> : null}
-        {!this.state.gameStart ? <Container fluid>
-        <Row>
-          <Col>
-              <h1 className = "text-center">Market Simulator</h1>
-          </Col>
-        </Row>
-        <hr/>
-        <Row>
-          <Col sm={12}>
+      <Router>
+        <div>
+          <Container style={{justifyContent:'center', alignItems:'center'}} fluid>
             <Row>
-              <Col md={{ span: 3, offset: 3 }}>
-                <label for="inputDate"></label>
-                <input id="inputDate" name="currentDate" type = "date" 
-                        value = {this.state.currentDate} onChange={this.handleDateChange}></input>
-              </Col>
-              <Col md={{ offset: 1 }}>
-              <button onClick={this.gameStart}>
-          START
-        </button> 
+              <Col>
+                  <h1 className = "text-center">MKRTR</h1>
               </Col>
             </Row>
-          </Col>
-        </Row>
-      </Container> : null }
-
-      {this.state.gameStart && !this.state.loading ? <Container fluid>
-        <MainPage
-            dummyStocks={this.state.stocks}
-            chosenDate = {this.state.currentDate}
-            handleNextDay={this.handleNextDayChange}
-            budget = {this.state.budget}
-            profit = {this.state.profit}
-            handleSharesChange = {this.handleSharesChange}
-            handleBuyShares = {this.handleBuyShares}
-            portfolio = {this.state.portfolio}
-            handleSharesSell = {this.handleSharesSell}
-            handleSellShares = {this.handleSellShares}
-        />
-      </Container> : null}
-      </div>
+            <hr/>
+            <Route path="/" component={StartView} exact />
+            <Route path="/loading" component={Loader} />
+            <Route path="/game" component={GameView} />
+          </Container> 
+        {this.state.gameStart && !this.state.loading ? <Container fluid>
+          <GameView
+              dummyStocks={this.state.stocks}
+              chosenDate = {this.state.currentDate}
+              handleNextDay={this.handleNextDayChange}
+              budget = {this.state.budget}
+              profit = {this.state.profit}
+              handleSharesChange = {this.handleSharesChange}
+              handleBuyShares = {this.handleBuyShares}
+              portfolio = {this.state.portfolio}
+              handleSharesSell = {this.handleSharesSell}
+              handleSellShares = {this.handleSellShares}
+          />
+        </Container> : null}
+        </div>
+      </Router>
 
     );
   }
