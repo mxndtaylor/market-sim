@@ -7,6 +7,7 @@ const GET_API_CLOSINGS = "http://localhost:8080/api/closings/"
 // TODO: move API endpoints to a file that the backend can also access
 // have the front and back generate their endpoints from that file
 // manually set the endpoints in that file (maybe a RAML file? parsing would be an issue)
+// potentially in application.properties
 
 class APIService{
 
@@ -40,9 +41,6 @@ class APIService{
               return this.response
             })
         }
-
-
-
 }
 
 export default new APIService();
