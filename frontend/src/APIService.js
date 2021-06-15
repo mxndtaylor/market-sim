@@ -9,38 +9,81 @@ const GET_API_CLOSINGS = "http://localhost:8080/api/closings/"
 // manually set the endpoints in that file (maybe a RAML file? parsing would be an issue)
 // potentially in application.properties
 
-class APIService{
+class APIService {
 
-    initializeStocks(date) {
-        return axios.get(GET_API_STOCKS + 'initDB/' + date)
-    }
+	// TODO: make this unnecessary as it is not RESTful
+	// ideally saved games have the relevant data in the table
+	// old, unused stuff should be purged somehow
+	initializeStocks(date) {
+		return axios.get(GET_API_STOCKS + 'initDB/' + date);
+	}
 
-    getPricesByDate(date) {
-        console.log("AXIOS GOT DATE: " + date)
-        return axios.get(GET_API_CLOSINGS + date)
-    }
+	getMarketByDate(date) {
+		return axios.get(GET_API_CLOSINGS + date);
+	}
 
-    createPortfolio(date){
-        let portfolios = {date: date, cash: 10000, startDate: date, startCash: 10000}
-        return axios.post(GET_API_PORTFOLIO+"/member", portfolios)
-    }
+	createPortfolio(date, principle) {
+		if (principle == null || principle == 0) {
+			principle = 10000;
+		} else {
+			principle = Math.abs(principle);
+		}
 
-    buyShares(memberId, ticker, purchaseDate, amount){
-        let holdings = {portfolioId:memberId, ticker: ticker, purchaseDate:purchaseDate, shareQuantity:amount}
-        return axios.post(GET_API_PORTFOLIO+"/member/"+memberId+"/holdings", holdings)
-    }
+		const portfolio = {
+			date: date, 
+			cash: principle, 
+			startDate: date, 
+			startCash: principle
+		};
 
-    getTickerPriceForDate(date, ticker){
-        return axios.get(GET_API_CLOSINGS+ "/price/"+date+"/"+ticker)
-    }
+		return axios.post(
+			GET_API_PORTFOLIO + "/member", 
+			portfolio
+		);
+	}
 
-    getTickerPforD (date, ticker) {
-        return axios.get(GET_API_CLOSINGS+ "/price/"+date+"/"+ticker)
-            .then(response => {
-              this.response = response.data
-              return this.response
-            })
-        }
+	nextDay(portfolio) {
+		portfolio.date.setDate(date.getDate() + 1);
+		return axios.put(
+			GET_API_PORTFOLIO + "/member", 
+			portfolio
+		);
+	}
+
+	buyShares(portfolioId, ticker, quantity) {
+		const buyOrder = {
+			ticker: ticker, 
+			quantity: quantity,
+		};
+		return axios.post(
+			GET_API_PORTFOLIO + "/member/" + portfolioId + "/holdings/member", 
+			buyOrder
+		);
+	}
+
+	sellShares(portfolioId, ticker, quantity) {
+		const sellOrder = {
+			ticker: ticker,
+			quantity: quantity,
+		};
+		return axios.put(
+			GET_API_PORTFOLIO + "/member/" + portfolioId + "/holdings/member", 
+			sellOrder
+		);
+	}
+
+	getTickerPriceForDate(date, ticker) {
+		return axios.get(GET_API_CLOSINGS + "/price/" + date + "/" + ticker);
+	}
+
+	// TODO: figure out why this was done
+	getTickerPforD (date, ticker) {
+		return axios.get(GET_API_CLOSINGS + "/price/" + date + "/" + ticker)
+			.then(response => {
+			  this.response = response.data
+			  return this.response
+			});
+		}
 }
 
 export default new APIService();
