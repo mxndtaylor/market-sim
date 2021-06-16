@@ -8,7 +8,7 @@ import {
 	HoldingsSideBar, 
 	PortfolioOverview, 
 	Market,
-} from '../components';
+} from '../components/*';
 
 function formatDate(date) {
 	if(typeof(date) === 'string'){

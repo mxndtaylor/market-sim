@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import PiggyBank from '../assets/svgs/PiggyBank';
+import {PiggyBank} from '../assets/svgs/*';
 
 class StockCard extends Component {	
 	render() {
