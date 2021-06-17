@@ -70,47 +70,24 @@ class GameView extends Component {
 		if(typeof(this.state.currentDate) === 'string'){
 
 			date = new Date(this.state.currentDate + "T00:00:00")
-		}
-		else{
+		} else {
 			date = new Date(this.state.currentDate)
 			date.setDate(date.getDate()+1);
 		}
 	
 		this.setState({
 			currentDate: date
-		}, function(){
-	
-	}
-		);
+		});
 
 		APIService.getPricesByDate(formatDateForNext(date))
 			.then(res => {
-	 
-			this.setState ({
-				stocks: res.data
+				this.setState ({
+					stocks: res.data
+				})
 			})
- 
-		})
-	}
-
-	handleSharesSell = (event) => {
-
-		let inputName = event.target.name;
-		let inputValue = event.target.value;
-	
-
-		rNumShares = Number(inputValue)
-		console.log('HSHARESSELL')
-		console.log(rNumShares)
-	}
-
-	handleSharesChange = (event) => {
-		let inputName = event.target.name;
-		let inputValue = event.target.value;
-		rNumShares = Number(inputValue)
 	}
 	
-	handleBuyShares = (currKey) => {
+	handleBuyEvent = (currKey) => {
 		let tempPort = this.state.portfolio
 		let curStock = this.state.stocks[currKey]
 		let curTicker = curStock.ticker
@@ -215,21 +192,6 @@ class GameView extends Component {
 											handleSharesSell = {this.props.handleSharesSell}	 
 											handleSellShares = {this.props.handleSellShares} /> 
 					})}
-				</Col>
-				<Col>
-					<h2 align ="center">Stocks</h2>
-					<div className="cards" id="box" name="box">
-						{this.props.dummyStocks.length !== 0 ?<Row>
-								{this.props.dummyStocks.map((stock,i) => {
-									return <StockCard stock = {stock} myKey = {i} key = {i}
-											handleSharesChange = {this.props.handleSharesChange}	
-											handleBuyShares = {this.props.handleBuyShares} /> 
-								})}
-						</Row> : null}
-						{this.props.dummyStocks.length === 0 ?<Row>
-							<h1 align ="center">MARKET CLOSED</h1>
-						</Row> : null}	 
-					</div>
 				</Col>
 			</Row>
 			</>

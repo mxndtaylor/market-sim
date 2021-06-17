@@ -40,6 +40,10 @@ class Market extends Component {
 				</Col>
 			</Row>
 			<Row className="row-col-1 row-col-md-4">
+				{/* Make this unnecessary */}
+				{this.props.stocks.length === 0 ? 
+					<h1 align ="center">MARKET CLOSED</h1>
+				: null}	 
 				{this.props.stocks.map((stock, key) => {
 					const {ticker, price} = stock;
 					return (
