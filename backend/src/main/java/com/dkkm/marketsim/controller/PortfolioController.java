@@ -1,5 +1,6 @@
 package com.dkkm.marketsim.controller;
 
+import com.dkkm.marketsim.model.dao.PortfolioDao;
 import com.dkkm.marketsim.model.dto.Holding;
 import com.dkkm.marketsim.model.dto.Portfolio;
 import com.dkkm.marketsim.service.PortfolioService;
@@ -40,24 +41,25 @@ public class PortfolioController {
         return ResponseEntity.ok(portfolio);
     }
 
-    @PostMapping("/member/{memberId}/holdings")
+    @PostMapping("/member/{memberId}/holdings/member")
     public ResponseEntity<Integer> buyPortfolioShares(
             @PathVariable int memberId,
-            @RequestBody Holding holding) {
-        String ticker = holding.getTicker();
-        LocalDate date = holding.getPurchaseDate();
-        int buyQuantity = holding.getShareQuantity();
+            @RequestBody Holding buyOrder) {
+        String ticker = buyOrder.getTicker();
+        LocalDate date = buyOrder.getPurchaseDate();
+        int buyQuantity = buyOrder.getShareQuantity();
         Holding bought = portfolioService.buyTickerQuantityForPortfolio(memberId, ticker, date, buyQuantity);
         return new ResponseEntity<>(bought.getShareQuantity(), HttpStatus.OK);
     }
 
-    @PostMapping("/member/{memberId}/{ticker}/{quantity}")
+    @PatchMapping("/member/{memberId}/holdings/member")
     public ResponseEntity<Integer> sellPortfolioShares(
-            @PathVariable int memberId, @PathVariable String ticker,
-            @PathVariable Integer quantity) {
+            @PathVariable int memberId,
+            @RequestBody Holding sellOrder) {
         // TODO: add validator check
-        Holding sold = portfolioService.sellTickerQuantityFromPortfolio(
-                memberId, ticker, quantity);
+        int quantity = sellOrder.getShareQuantity();
+        String ticker = sellOrder.getTicker();
+        Holding sold = portfolioService.sellTickerQuantityFromPortfolio(memberId, ticker, quantity);
 
         return new ResponseEntity<>(sold.getShareQuantity(), HttpStatus.OK);
     }
@@ -65,12 +67,21 @@ public class PortfolioController {
     @PutMapping("/member")
     public ResponseEntity updatePortfolio(@RequestBody Portfolio portfolio) {
         boolean succeeded = portfolioService.updateMember(portfolio);
+        // TODO: add exception on false
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/member")
+    public ResponseEntity nextMarketDay(@RequestBody Portfolio portfolio) {
+        boolean succeeded = portfolioService.nextMarketDay(portfolio);
+        // TODO: add exception on false
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/member/{memberId}")
     public ResponseEntity deletePortfolio(@PathVariable int memberId) {
         boolean succeeded = portfolioService.deleteMemberByKey(memberId);
+        // TODO: add exception on false
         return ResponseEntity.noContent().build();
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -148,7 +149,19 @@ public class PortfolioServiceImpl
         return receipt;
     }
 
-    private Holding makePurchasePreview(Portfolio portfolio, String ticker,LocalDate date, int purchasesDesired) {
+    @Override
+    public boolean nextMarketDay(Portfolio portfolio) {
+        Portfolio fetched = dao.getMemberByKey(portfolio.getId());
+        LocalDate nextDay = portfolio.getDate();
+        if (nextDay.isAfter(fetched.getDate())
+                && closingService.getClosingsByDate(nextDay).size() != 0) {
+            fetched.setDate(nextDay);
+            return dao.updateMember(fetched);
+        }
+        return false;
+    }
+
+    private Holding makePurchasePreview(Portfolio portfolio, String ticker, LocalDate date, int purchasesDesired) {
         BigDecimal price = closingService.getSharePrice(ticker, date);
         BigDecimal budget = portfolio.getCash();
 
