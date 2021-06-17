@@ -1,36 +1,13 @@
 import React, {Component} from 'react';
 import './GameView.css';
-import {Row, Col, Card, Button, Form} from "react-bootstrap";
+import {Row, Col} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import APIService from '../APIService';
-import StockCard from '../components/StockCard';
 import {
 	HoldingsSideBar, 
 	PortfolioOverview, 
 	Market,
 } from '../components/*';
-
-function formatDate(date) {
-	if(typeof(date) === 'string'){
-		var month = '' + date.substring(5,7),
-		day = '' + date.substring(8,10),
-		year = '' + date.substring(0,4);
-		return [month, day, year].join('-');
-	}
-
-	var d = new Date(date),
-		month = '' + (d.getMonth() + 1),
-		day = '' + d.getDate(),
-		year = d.getFullYear();
-	
-	if (month.length < 2) 
-		month = '0' + month;
-	if (day.length < 2) 
-		day = '0' + day;
-	
-	return [month, day, year].join('-');
-}
-
 
 class GameView extends Component {
 	constructor(props) {
