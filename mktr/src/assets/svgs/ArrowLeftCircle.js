@@ -1,16 +1,19 @@
 import React, {Component} from 'react';
+import SvgIcon from './SvgIcon';
 
-const PATHS = 
-[
-	"M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 "
-	+ "8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 "
-	+ "2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 "
-	+ "0 1 0-.708.708L10.293 7.5H4.5z",
-];
+const NAME = "arrow-left-circle"
 
 class ArrowLeftCircle extends Component {
+	constructor(props) {
+		props.svg = svgContent.svgs.find(svg => svg.name === "arrow-circle");
+
+		super(props);
+	}
+
 	render() {
-		return (
+		return <SvgIcon name={NAME} width={this.props.width} height={this.props.height} 
+					paths={this.props.svg.paths} transform={} />
+		(
 			<svg xmlns="http://www.w3.org/2000/svg" 
 				width="20" height="20" fill="currentColor" 
 				class="bi bi-arrow-left-circle" viewBox="0 0 16 16">
