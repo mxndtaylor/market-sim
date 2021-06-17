@@ -2,15 +2,15 @@ import React, {Component} from 'react';
 import {PiggyBank} from '../assets/svgs/*';
 
 class StockCard extends Component {	
-	handleSharesChange(event) {
-		const numShares = event.target.value;
+	handleShareNumChange(event) {
+		const shareNum = event.target.value;
 		this.setState({
-			numShares: numShares,
+			shareNum: shareNum,
 		});
 	}
 
 	handleBuyShares() {
-		this.props.onBuyShares(this.props.ticker, this.state.numShares);
+		this.props.onBuyShares(this.props.ticker, this.state.shareNum);
 	}
 
 	render() {
@@ -24,7 +24,7 @@ class StockCard extends Component {
 					</Card.Text>
 					<Form style={{width: '100%'}}>
 						<Form.Control type="text" placeholder="# of shares" 
-								name="numShares" onChange={this.handleSharesChange} />
+								name="shareBuyNum" onChange={this.handleShareNumChange} />
 					</Form>
 					<Button className="buy-button" variant="warning" 
 							onClick={this.handleBuyShares}>

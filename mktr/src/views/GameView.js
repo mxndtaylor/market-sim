@@ -184,16 +184,6 @@ class GameView extends Component {
 					/>
 				</Col>
 			</Row>
-			<Row>
-				<Col>
-					<h5 className = "text-center">Portfolio</h5>
-					{this.props.portfolio.map((inPortfolio,i) => {
-						return <StocksHeld	inPortfolio = {inPortfolio} myKey = {i} key = {i}
-											handleSharesSell = {this.props.handleSharesSell}	 
-											handleSellShares = {this.props.handleSellShares} /> 
-					})}
-				</Col>
-			</Row>
 			</>
 		)
 	}

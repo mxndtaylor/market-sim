@@ -5,24 +5,27 @@ import CurrencyDollar from '../assets/svgs/CurrencyDollar';
 class HoldingCard extends Component {
 	handleShareNumChange(event) {
 		this.setState({
-			numShares: event.target.value,
+			shareNum: event.target.value,
 		});
 	}
 
 	handleSellShares() {
-		this.props.sellShares(this.props.ticker, this.state.numShares);
+		this.props.sellShares(this.props.ticker, this.state.shareNum);
 	}
 
 	render(){
 		const {ticker, price, lastPrice, quantity, invested, sellShares} = this.props;
 
+		const marketValue = price * quantity;
+
 		const dailyChange = (price - lastPrice) * quantity;
 		const dailyChangePercent = (dailyChange) / invested;
-		const sign = (dailyChange > 0) ? "+" : "-";
-		const displayChange = (sign + '$' + Math.abs(dailyChange));
-		const displayChangePercent = (sign + Math.abs(dailyChangePercent) + '%');
 
-		const marketValue = price * quantity;
+		// format change to be "+/-$XXX" and percent to be "+/-XX.X%"
+		const sign = (dailyChange > 0) ? "+" : "-";
+		const displayChange = `${sign}$${Math.abs(dailyChange).toFixed(2)}`;
+		const displayChangePercent = `${sign}${Math.abs(dailyChangePercent).toFixed(2)}%`;
+
 		return (
 			<Card body>
 				<Card.Title>{ticker}</Card.Title>
@@ -54,8 +57,8 @@ class HoldingCard extends Component {
 					</Row>
 				</Card.Text>
 				<Form>
-					<Form.Control type="text" placeholder="# of shares" name="numSharesSell"
-							onChange={this.handleShareNumChange} />
+					<Form.Control type="text" placeholder="# of shares" 
+							name="shareSellNum" onChange={this.handleShareNumChange} />
 					<Button className ="sell-button" variant="success" 
 							onClick={this.handleSellShares}>
 						<CurrencyDollar />
